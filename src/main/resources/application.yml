@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/menu-deliver
+    username: postgres
+    password: postgres
+
+server:
+  port: 48080
+  servlet:
+    context-path: /
+
+logging:
+  level:
+    com:
+      varie:
+        api:
+          mapper: DEBUG
