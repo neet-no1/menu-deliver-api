@@ -1,0 +1,37 @@
+<!DOCTYPE generatorConfiguration PUBLIC
+ "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+ "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+	<context id="simple" targetRuntime="MyBatis3Simple">
+		<jdbcConnection driverClass="org.postgresql.Driver"
+			connectionURL="jdbc:postgresql://localhost:5432/menu_deliver"
+			password="postgres" userId="postgres" />
+
+		<javaModelGenerator targetPackage="jp.co.suyama.menu.deliver.model.db"
+			targetProject="menu-deliver-api/src/main/java" />
+
+		<javaClientGenerator type="ANNOTATEDMAPPER"
+			targetPackage="jp.co.suyama.menu.deliver.mapper.auto" targetProject="menu-deliver-api/src/main/java" />
+
+		<table tableName="users" />
+		<table tableName="followers" />
+		<table tableName="notices" />
+		<table tableName="recommend_articles" />
+		<table tableName="favorite_menus" />
+		<table tableName="menu_categories" />
+		<table tableName="menus" />
+		<table tableName="menu_pictures" />
+		<table tableName="menu_details" />
+		<table tableName="menu_views" />
+		<table tableName="articles" />
+		<table tableName="article_details" />
+		<table tableName="article_views" />
+		<table tableName="article_pictures" />
+		<table tableName="favorite_articles" />
+		<table tableName="questions" />
+		<table tableName="question_images" />
+		<table tableName="answers" />
+		<table tableName="answer_images" />
+
+	</context>
+</generatorConfiguration>
