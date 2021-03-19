@@ -1,0 +1,149 @@
+package jp.co.suyama.menu.deliver.model.auto;
+
+import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import jp.co.suyama.menu.deliver.model.auto.ErrorInfo;
+import jp.co.suyama.menu.deliver.model.auto.MenuDeliverResponse;
+import org.springframework.validation.annotation.Validated;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
+
+/**
+ * NoticesResponse
+ */
+@Validated
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-19T19:06:35.752+09:00")
+
+
+
+
+public class NoticesResponse extends MenuDeliverResponse  {
+  @JsonProperty("code")
+  private Integer code = null;
+
+  @JsonProperty("errorInfo")
+  private ErrorInfo errorInfo = null;
+
+  @JsonProperty("info")
+  @Valid
+  private List<String> info = null;
+
+  public NoticesResponse code(Integer code) {
+    this.code = code;
+    return this;
+  }
+
+  /**
+   * 0以外はエラーコード
+   * @return code
+  **/
+  @ApiModelProperty(example = "0", value = "0以外はエラーコード")
+
+
+  public Integer getCode() {
+    return code;
+  }
+
+  public void setCode(Integer code) {
+    this.code = code;
+  }
+
+  public NoticesResponse errorInfo(ErrorInfo errorInfo) {
+    this.errorInfo = errorInfo;
+    return this;
+  }
+
+  /**
+   * Get errorInfo
+   * @return errorInfo
+  **/
+  @ApiModelProperty(value = "")
+
+  @Valid
+
+  public ErrorInfo getErrorInfo() {
+    return errorInfo;
+  }
+
+  public void setErrorInfo(ErrorInfo errorInfo) {
+    this.errorInfo = errorInfo;
+  }
+
+  public NoticesResponse info(List<String> info) {
+    this.info = info;
+    return this;
+  }
+
+  public NoticesResponse addInfoItem(String infoItem) {
+    if (this.info == null) {
+      this.info = new ArrayList<String>();
+    }
+    this.info.add(infoItem);
+    return this;
+  }
+
+  /**
+   * Get info
+   * @return info
+  **/
+  @ApiModelProperty(example = "[\"【お知らせ】サイトをリニューアルしました。\",\"【お知らせ】サイトがリリースされました。\"]", value = "")
+
+
+  public List<String> getInfo() {
+    return info;
+  }
+
+  public void setInfo(List<String> info) {
+    this.info = info;
+  }
+
+
+  @Override
+  public boolean equals(java.lang.Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    NoticesResponse noticesResponse = (NoticesResponse) o;
+    return Objects.equals(this.code, noticesResponse.code) &&
+        Objects.equals(this.errorInfo, noticesResponse.errorInfo) &&
+        Objects.equals(this.info, noticesResponse.info) &&
+        super.equals(o);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(code, errorInfo, info, super.hashCode());
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("class NoticesResponse {\n");
+    sb.append("    ").append(toIndentedString(super.toString())).append("\n");
+    sb.append("    code: ").append(toIndentedString(code)).append("\n");
+    sb.append("    errorInfo: ").append(toIndentedString(errorInfo)).append("\n");
+    sb.append("    info: ").append(toIndentedString(info)).append("\n");
+    sb.append("}");
+    return sb.toString();
+  }
+
+  /**
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
+   */
+  private String toIndentedString(java.lang.Object o) {
+    if (o == null) {
+      return "null";
+    }
+    return o.toString().replace("\n", "\n    ");
+  }
+}
+
