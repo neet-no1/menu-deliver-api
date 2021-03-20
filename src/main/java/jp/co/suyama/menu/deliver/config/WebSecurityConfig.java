@@ -40,9 +40,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // ログイン処理を行うURL
                 .loginProcessingUrl("/login")
                 // ユーザIDのパラメタ名
-                .usernameParameter("user_id")
+                .usernameParameter("email")
                 // パスワードのパラメタ名
-                .passwordParameter("user_password")
+                .passwordParameter("password")
                 .permitAll()
                 .successHandler(new LoginAuthenticationHandler())
                 .failureHandler(new LoginAuthenticationHandler())
