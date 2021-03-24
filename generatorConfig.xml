@@ -32,6 +32,7 @@
 		<table tableName="question_images" />
 		<table tableName="answers" />
 		<table tableName="answer_images" />
+		<table tableName="compositions" />
 
 	</context>
 </generatorConfiguration>
