@@ -26,7 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.util.List;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-19T19:06:35.752+09:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-24T14:39:40.139+09:00")
 
 @Validated
 @Api(value = "article", description = "the article API")
@@ -79,7 +79,8 @@ public interface ArticleApi {
         @ApiResponse(code = 400, message = "200以外の時のは通信失敗をクライアントに通達") })
     @RequestMapping(value = "/article",
         produces = { "application/json" }, 
+        consumes = { "multipart/form-data" },
         method = RequestMethod.POST)
-    ResponseEntity<BasicResponse> postArticle(@ApiParam(value = "内容", required=true) @RequestParam(value="contents", required=true)  String contents,@ApiParam(value = "記事のタイトル", required=true) @RequestParam(value="title", required=true)  String title,@ApiParam(value = "投稿/保存のフラグ", required=true) @RequestParam(value="isOpened", required=true)  Boolean isOpened,@ApiParam(value = "記事のサムネイル画像") @Valid @RequestPart(value="thumb", required=false) MultipartFile thumb);
+    ResponseEntity<BasicResponse> postArticle(@ApiParam(value = "記事ID　存在しない場合は0", required=true) @RequestParam(value="id", required=true)  Integer id,@ApiParam(value = "記事のタイトル", required=true) @RequestParam(value="title", required=true)  String title,@ApiParam(value = "内容", required=true) @RequestParam(value="contents", required=true)  String contents,@ApiParam(value = "投稿/保存のフラグ", required=true) @RequestParam(value="opened", required=true)  Boolean opened,@ApiParam(value = "記事のサムネイル画像") @Valid @RequestPart(value="thumb", required=false) MultipartFile thumb);
 
 }

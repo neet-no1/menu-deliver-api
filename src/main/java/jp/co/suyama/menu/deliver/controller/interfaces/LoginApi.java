@@ -6,6 +6,7 @@
 package jp.co.suyama.menu.deliver.controller.interfaces;
 
 import jp.co.suyama.menu.deliver.model.auto.BasicResponse;
+import jp.co.suyama.menu.deliver.model.auto.LoginParam;
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -21,7 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.util.List;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-19T19:06:35.752+09:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-24T14:39:40.139+09:00")
 
 @Validated
 @Api(value = "login", description = "the login API")
@@ -35,6 +36,6 @@ public interface LoginApi {
     @RequestMapping(value = "/login",
         produces = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<BasicResponse> login();
+    ResponseEntity<BasicResponse> login(@ApiParam(value = "" ,required=true )  @Valid @RequestBody LoginParam loginParam);
 
 }

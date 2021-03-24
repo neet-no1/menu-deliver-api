@@ -23,31 +23,31 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.util.List;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-19T19:06:35.752+09:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-24T14:39:40.139+09:00")
 
 @Validated
 @Api(value = "search", description = "the search API")
 @RequestMapping(value = "")
 public interface SearchApi {
 
-    @ApiOperation(value = "記事検索", nickname = "searchArticles", notes = "記事情報を検索 新着順(更新日時)で表示する 認証不要 ", response = MenusResponse.class, tags={ "Article", })
+    @ApiOperation(value = "記事検索", nickname = "searchArticles", notes = "記事情報を検索 新着順(更新日時)で表示する 認証不要 ", response = ArticlesResponse.class, tags={ "Article", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "通信成功時の返却値", response = MenusResponse.class),
+        @ApiResponse(code = 200, message = "通信成功時の返却値", response = ArticlesResponse.class),
         @ApiResponse(code = 400, message = "200以外の時のは通信失敗をクライアントに通達") })
     @RequestMapping(value = "/search/articles",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<MenusResponse> searchArticles(@ApiParam(value = "選択したタグIDの配列") @Valid @RequestParam(value = "tags", required = false) List<Integer> tags,@ApiParam(value = "検索キーワード") @Valid @RequestParam(value = "keyword", required = false) String keyword);
+    ResponseEntity<ArticlesResponse> searchArticles(@ApiParam(value = "検索キーワード", defaultValue = "") @Valid @RequestParam(value = "keyword", required = false, defaultValue="") String keyword,@ApiParam(value = "取得ページ番号", defaultValue = "1") @Valid @RequestParam(value = "page", required = false, defaultValue="1") Integer page);
 
 
-    @ApiOperation(value = "献立検索", nickname = "searchMenus", notes = "献立情報を検索 タグを指定した場合、そのタグのみ取得する タグを指定しない場合、全てを取得する 認証不要 ", response = ArticlesResponse.class, tags={ "Article", })
+    @ApiOperation(value = "献立検索", nickname = "searchMenus", notes = "献立情報を検索 タグを指定した場合、そのタグのみ取得する タグを指定しない場合、全てを取得する 認証不要 ", response = MenusResponse.class, tags={ "Menu", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "通信成功時の返却値", response = ArticlesResponse.class),
+        @ApiResponse(code = 200, message = "通信成功時の返却値", response = MenusResponse.class),
         @ApiResponse(code = 400, message = "200以外の時のは通信失敗をクライアントに通達") })
     @RequestMapping(value = "/search/menus",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<ArticlesResponse> searchMenus(@ApiParam(value = "検索キーワード") @Valid @RequestParam(value = "keyword", required = false) String keyword);
+    ResponseEntity<MenusResponse> searchMenus(@ApiParam(value = "検索キーワード") @Valid @RequestParam(value = "keyword", required = false) String keyword,@ApiParam(value = "検索カテゴリIDリスト") @Valid @RequestParam(value = "categories", required = false) List<Integer> categories,@ApiParam(value = "取得ページ番号", defaultValue = "1") @Valid @RequestParam(value = "page", required = false, defaultValue="1") Integer page);
 
 
     @ApiOperation(value = "質問検索", nickname = "searchQuestions", notes = "質問情報を検索 タグを指定した場合、そのタグのみ表示する タグを指定しない場合、新着、未解決、解決済みの全てを取得する 認証不要 ", response = QuestionsResponse.class, tags={ "Question", })
@@ -57,6 +57,6 @@ public interface SearchApi {
     @RequestMapping(value = "/search/questions",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<QuestionsResponse> searchQuestions(@ApiParam(value = "選択したタグIDの配列") @Valid @RequestParam(value = "tags", required = false) List<Integer> tags,@ApiParam(value = "検索キーワード") @Valid @RequestParam(value = "keyword", required = false) String keyword);
+    ResponseEntity<QuestionsResponse> searchQuestions(@NotNull @ApiParam(value = "新着の取得ページ番号", required = true, defaultValue = "1") @Valid @RequestParam(value = "pageNewArrival", required = true, defaultValue="1") Integer pageNewArrival,@NotNull @ApiParam(value = "未解決の取得ページ番号", required = true, defaultValue = "1") @Valid @RequestParam(value = "pageUnsolved", required = true, defaultValue="1") Integer pageUnsolved,@NotNull @ApiParam(value = "解決済みの取得ページ番号", required = true, defaultValue = "1") @Valid @RequestParam(value = "pageSolved", required = true, defaultValue="1") Integer pageSolved,@ApiParam(value = "選択したタグIDの配列") @Valid @RequestParam(value = "tags", required = false) List<Integer> tags,@ApiParam(value = "検索キーワード") @Valid @RequestParam(value = "keyword", required = false) String keyword);
 
 }

@@ -10,7 +10,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * DeleteArticleParam
+ * PasswordResetParam
  */
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-24T14:39:40.139+09:00")
@@ -18,28 +18,28 @@ import javax.validation.constraints.*;
 
 
 
-public class DeleteArticleParam   {
-  @JsonProperty("id")
-  private Integer id = null;
+public class PasswordResetParam   {
+  @JsonProperty("email")
+  private String email = null;
 
-  public DeleteArticleParam id(Integer id) {
-    this.id = id;
+  public PasswordResetParam email(String email) {
+    this.email = email;
     return this;
   }
 
   /**
-   * 記事ID
-   * @return id
+   * パスワードリセット用メールアドレス
+   * @return email
   **/
-  @ApiModelProperty(example = "3", value = "記事ID")
+  @ApiModelProperty(example = "aaa.bbb@gmail.com", value = "パスワードリセット用メールアドレス")
 
 
-  public Integer getId() {
-    return id;
+  public String getEmail() {
+    return email;
   }
 
-  public void setId(Integer id) {
-    this.id = id;
+  public void setEmail(String email) {
+    this.email = email;
   }
 
 
@@ -51,21 +51,21 @@ public class DeleteArticleParam   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    DeleteArticleParam deleteArticleParam = (DeleteArticleParam) o;
-    return Objects.equals(this.id, deleteArticleParam.id);
+    PasswordResetParam passwordResetParam = (PasswordResetParam) o;
+    return Objects.equals(this.email, passwordResetParam.email);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id);
+    return Objects.hash(email);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class DeleteArticleParam {\n");
+    sb.append("class PasswordResetParam {\n");
     
-    sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    email: ").append(toIndentedString(email)).append("\n");
     sb.append("}");
     return sb.toString();
   }

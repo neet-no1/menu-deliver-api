@@ -15,7 +15,7 @@ import javax.validation.constraints.*;
  * MenuData
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-19T19:06:35.752+09:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-24T14:39:40.139+09:00")
 
 
 
@@ -27,6 +27,12 @@ public class MenuData   {
   @JsonProperty("title")
   private String title = null;
 
+  @JsonProperty("subTitle")
+  private String subTitle = null;
+
+  @JsonProperty("categoryId")
+  private Integer categoryId = null;
+
   @JsonProperty("thumbPath")
   private String thumbPath = null;
 
@@ -35,7 +41,10 @@ public class MenuData   {
 
   @JsonProperty("imagePaths")
   @Valid
-  private List<String> imagePaths = null;
+  private List<Object> imagePaths = null;
+
+  @JsonProperty("opened")
+  private Boolean opened = null;
 
   public MenuData id(Integer id) {
     this.id = id;
@@ -75,6 +84,46 @@ public class MenuData   {
 
   public void setTitle(String title) {
     this.title = title;
+  }
+
+  public MenuData subTitle(String subTitle) {
+    this.subTitle = subTitle;
+    return this;
+  }
+
+  /**
+   * 献立のサブタイトル
+   * @return subTitle
+  **/
+  @ApiModelProperty(example = "材料少なめで、すぐできます。", value = "献立のサブタイトル")
+
+
+  public String getSubTitle() {
+    return subTitle;
+  }
+
+  public void setSubTitle(String subTitle) {
+    this.subTitle = subTitle;
+  }
+
+  public MenuData categoryId(Integer categoryId) {
+    this.categoryId = categoryId;
+    return this;
+  }
+
+  /**
+   * 献立のカテゴリ
+   * @return categoryId
+  **/
+  @ApiModelProperty(example = "1", value = "献立のカテゴリ")
+
+
+  public Integer getCategoryId() {
+    return categoryId;
+  }
+
+  public void setCategoryId(Integer categoryId) {
+    this.categoryId = categoryId;
   }
 
   public MenuData thumbPath(String thumbPath) {
@@ -117,14 +166,14 @@ public class MenuData   {
     this.contents = contents;
   }
 
-  public MenuData imagePaths(List<String> imagePaths) {
+  public MenuData imagePaths(List<Object> imagePaths) {
     this.imagePaths = imagePaths;
     return this;
   }
 
-  public MenuData addImagePathsItem(String imagePathsItem) {
+  public MenuData addImagePathsItem(Object imagePathsItem) {
     if (this.imagePaths == null) {
-      this.imagePaths = new ArrayList<String>();
+      this.imagePaths = new ArrayList<Object>();
     }
     this.imagePaths.add(imagePathsItem);
     return this;
@@ -134,15 +183,35 @@ public class MenuData   {
    * Get imagePaths
    * @return imagePaths
   **/
-  @ApiModelProperty(example = "[\"/public/menu_images/xxx\",\"/public/menu_images/yyy\"]", value = "")
+  @ApiModelProperty(value = "")
 
 
-  public List<String> getImagePaths() {
+  public List<Object> getImagePaths() {
     return imagePaths;
   }
 
-  public void setImagePaths(List<String> imagePaths) {
+  public void setImagePaths(List<Object> imagePaths) {
     this.imagePaths = imagePaths;
+  }
+
+  public MenuData opened(Boolean opened) {
+    this.opened = opened;
+    return this;
+  }
+
+  /**
+   * 公開済みか
+   * @return opened
+  **/
+  @ApiModelProperty(example = "true", value = "公開済みか")
+
+
+  public Boolean isOpened() {
+    return opened;
+  }
+
+  public void setOpened(Boolean opened) {
+    this.opened = opened;
   }
 
 
@@ -157,14 +226,17 @@ public class MenuData   {
     MenuData menuData = (MenuData) o;
     return Objects.equals(this.id, menuData.id) &&
         Objects.equals(this.title, menuData.title) &&
+        Objects.equals(this.subTitle, menuData.subTitle) &&
+        Objects.equals(this.categoryId, menuData.categoryId) &&
         Objects.equals(this.thumbPath, menuData.thumbPath) &&
         Objects.equals(this.contents, menuData.contents) &&
-        Objects.equals(this.imagePaths, menuData.imagePaths);
+        Objects.equals(this.imagePaths, menuData.imagePaths) &&
+        Objects.equals(this.opened, menuData.opened);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, title, thumbPath, contents, imagePaths);
+    return Objects.hash(id, title, subTitle, categoryId, thumbPath, contents, imagePaths, opened);
   }
 
   @Override
@@ -174,9 +246,12 @@ public class MenuData   {
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
+    sb.append("    subTitle: ").append(toIndentedString(subTitle)).append("\n");
+    sb.append("    categoryId: ").append(toIndentedString(categoryId)).append("\n");
     sb.append("    thumbPath: ").append(toIndentedString(thumbPath)).append("\n");
     sb.append("    contents: ").append(toIndentedString(contents)).append("\n");
     sb.append("    imagePaths: ").append(toIndentedString(imagePaths)).append("\n");
+    sb.append("    opened: ").append(toIndentedString(opened)).append("\n");
     sb.append("}");
     return sb.toString();
   }

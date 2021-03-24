@@ -1,6 +1,6 @@
 package jp.co.suyama.menu.deliver.controller.interfaces;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-19T19:06:35.752+09:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-24T14:39:40.139+09:00")
 
 public class ApiException extends Exception{
     private int code;

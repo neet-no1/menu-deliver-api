@@ -9,6 +9,7 @@ import jp.co.suyama.menu.deliver.model.auto.AccountAuthResponse;
 import jp.co.suyama.menu.deliver.model.auto.AccountResponse;
 import jp.co.suyama.menu.deliver.model.auto.ArticlesResponse;
 import jp.co.suyama.menu.deliver.model.auto.BasicResponse;
+import jp.co.suyama.menu.deliver.model.auto.MenusAndArticlesResponse;
 import jp.co.suyama.menu.deliver.model.auto.MenusResponse;
 import jp.co.suyama.menu.deliver.model.auto.RegistAccountParam;
 import org.springframework.core.io.Resource;
@@ -28,7 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.util.List;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-19T19:06:35.752+09:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-24T14:39:40.139+09:00")
 
 @Validated
 @Api(value = "account", description = "the account API")
@@ -65,14 +66,14 @@ public interface AccountApi {
     ResponseEntity<AccountResponse> getAccountInfo();
 
 
-    @ApiOperation(value = "お気に入り一覧を取得", nickname = "getFavoriteItems", notes = "お気に入りの記事と献立の一覧を取得する 認証必須 ", response = MenusResponse.class, tags={ "Favorite", })
+    @ApiOperation(value = "お気に入り一覧を取得", nickname = "getFavoriteItems", notes = "お気に入りの記事と献立の一覧を取得する 認証必須 ", response = MenusAndArticlesResponse.class, tags={ "Favorite", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "通信成功時の返却値", response = MenusResponse.class),
+        @ApiResponse(code = 200, message = "通信成功時の返却値", response = MenusAndArticlesResponse.class),
         @ApiResponse(code = 400, message = "200以外の時のは通信失敗をクライアントに通達") })
     @RequestMapping(value = "/account/favorites",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<MenusResponse> getFavoriteItems();
+    ResponseEntity<MenusAndArticlesResponse> getFavoriteItems(@ApiParam(value = "献立取得ページ番号(1~)", defaultValue = "1") @Valid @RequestParam(value = "menuPage", required = false, defaultValue="1") Integer menuPage,@ApiParam(value = "記事取得ページ番号(1~)", defaultValue = "1") @Valid @RequestParam(value = "articlePage", required = false, defaultValue="1") Integer articlePage);
 
 
     @ApiOperation(value = "投稿記事一覧取得", nickname = "getPostedArticles", notes = "自身が投稿した記事の一覧を取得 認証必須 ", response = ArticlesResponse.class, tags={ "Article", })

@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
 import jp.co.suyama.menu.deliver.model.auto.ErrorInfo;
 import jp.co.suyama.menu.deliver.model.auto.MenuDeliverResponse;
 import org.springframework.validation.annotation.Validated;
@@ -12,7 +14,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * QuestionDataResponse
+ * CompositionsResponse
  */
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-24T14:39:40.139+09:00")
@@ -20,7 +22,7 @@ import javax.validation.constraints.*;
 
 
 
-public class QuestionDataResponse extends MenuDeliverResponse  {
+public class CompositionsResponse extends MenuDeliverResponse  {
   @JsonProperty("code")
   private Integer code = null;
 
@@ -28,9 +30,10 @@ public class QuestionDataResponse extends MenuDeliverResponse  {
   private ErrorInfo errorInfo = null;
 
   @JsonProperty("info")
-  private Object info = null;
+  @Valid
+  private List<Object> info = null;
 
-  public QuestionDataResponse code(Integer code) {
+  public CompositionsResponse code(Integer code) {
     this.code = code;
     return this;
   }
@@ -50,7 +53,7 @@ public class QuestionDataResponse extends MenuDeliverResponse  {
     this.code = code;
   }
 
-  public QuestionDataResponse errorInfo(ErrorInfo errorInfo) {
+  public CompositionsResponse errorInfo(ErrorInfo errorInfo) {
     this.errorInfo = errorInfo;
     return this;
   }
@@ -71,8 +74,16 @@ public class QuestionDataResponse extends MenuDeliverResponse  {
     this.errorInfo = errorInfo;
   }
 
-  public QuestionDataResponse info(Object info) {
+  public CompositionsResponse info(List<Object> info) {
     this.info = info;
+    return this;
+  }
+
+  public CompositionsResponse addInfoItem(Object infoItem) {
+    if (this.info == null) {
+      this.info = new ArrayList<Object>();
+    }
+    this.info.add(infoItem);
     return this;
   }
 
@@ -83,11 +94,11 @@ public class QuestionDataResponse extends MenuDeliverResponse  {
   @ApiModelProperty(value = "")
 
 
-  public Object getInfo() {
+  public List<Object> getInfo() {
     return info;
   }
 
-  public void setInfo(Object info) {
+  public void setInfo(List<Object> info) {
     this.info = info;
   }
 
@@ -100,10 +111,10 @@ public class QuestionDataResponse extends MenuDeliverResponse  {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    QuestionDataResponse questionDataResponse = (QuestionDataResponse) o;
-    return Objects.equals(this.code, questionDataResponse.code) &&
-        Objects.equals(this.errorInfo, questionDataResponse.errorInfo) &&
-        Objects.equals(this.info, questionDataResponse.info) &&
+    CompositionsResponse compositionsResponse = (CompositionsResponse) o;
+    return Objects.equals(this.code, compositionsResponse.code) &&
+        Objects.equals(this.errorInfo, compositionsResponse.errorInfo) &&
+        Objects.equals(this.info, compositionsResponse.info) &&
         super.equals(o);
   }
 
@@ -115,7 +126,7 @@ public class QuestionDataResponse extends MenuDeliverResponse  {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class QuestionDataResponse {\n");
+    sb.append("class CompositionsResponse {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
     sb.append("    code: ").append(toIndentedString(code)).append("\n");
     sb.append("    errorInfo: ").append(toIndentedString(errorInfo)).append("\n");

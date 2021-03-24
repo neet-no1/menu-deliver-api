@@ -12,7 +12,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * QuestionDataResponse
+ * MenusAndArticlesResponse
  */
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-24T14:39:40.139+09:00")
@@ -20,7 +20,7 @@ import javax.validation.constraints.*;
 
 
 
-public class QuestionDataResponse extends MenuDeliverResponse  {
+public class MenusAndArticlesResponse extends MenuDeliverResponse  {
   @JsonProperty("code")
   private Integer code = null;
 
@@ -30,7 +30,7 @@ public class QuestionDataResponse extends MenuDeliverResponse  {
   @JsonProperty("info")
   private Object info = null;
 
-  public QuestionDataResponse code(Integer code) {
+  public MenusAndArticlesResponse code(Integer code) {
     this.code = code;
     return this;
   }
@@ -50,7 +50,7 @@ public class QuestionDataResponse extends MenuDeliverResponse  {
     this.code = code;
   }
 
-  public QuestionDataResponse errorInfo(ErrorInfo errorInfo) {
+  public MenusAndArticlesResponse errorInfo(ErrorInfo errorInfo) {
     this.errorInfo = errorInfo;
     return this;
   }
@@ -71,7 +71,7 @@ public class QuestionDataResponse extends MenuDeliverResponse  {
     this.errorInfo = errorInfo;
   }
 
-  public QuestionDataResponse info(Object info) {
+  public MenusAndArticlesResponse info(Object info) {
     this.info = info;
     return this;
   }
@@ -100,10 +100,10 @@ public class QuestionDataResponse extends MenuDeliverResponse  {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    QuestionDataResponse questionDataResponse = (QuestionDataResponse) o;
-    return Objects.equals(this.code, questionDataResponse.code) &&
-        Objects.equals(this.errorInfo, questionDataResponse.errorInfo) &&
-        Objects.equals(this.info, questionDataResponse.info) &&
+    MenusAndArticlesResponse menusAndArticlesResponse = (MenusAndArticlesResponse) o;
+    return Objects.equals(this.code, menusAndArticlesResponse.code) &&
+        Objects.equals(this.errorInfo, menusAndArticlesResponse.errorInfo) &&
+        Objects.equals(this.info, menusAndArticlesResponse.info) &&
         super.equals(o);
   }
 
@@ -115,7 +115,7 @@ public class QuestionDataResponse extends MenuDeliverResponse  {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class QuestionDataResponse {\n");
+    sb.append("class MenusAndArticlesResponse {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
     sb.append("    code: ").append(toIndentedString(code)).append("\n");
     sb.append("    errorInfo: ").append(toIndentedString(errorInfo)).append("\n");

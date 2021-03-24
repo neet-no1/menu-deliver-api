@@ -13,7 +13,7 @@ import javax.validation.constraints.*;
  * ArticleData
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-19T19:06:35.752+09:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-24T14:39:40.139+09:00")
 
 
 
@@ -34,11 +34,20 @@ public class ArticleData   {
   @JsonProperty("date")
   private String date = null;
 
+  @JsonProperty("userId")
+  private Integer userId = null;
+
+  @JsonProperty("userName")
+  private String userName = null;
+
   @JsonProperty("userIconPath")
   private String userIconPath = null;
 
   @JsonProperty("contents")
   private String contents = null;
+
+  @JsonProperty("opened")
+  private Boolean opened = null;
 
   public ArticleData id(Integer id) {
     this.id = id;
@@ -140,6 +149,46 @@ public class ArticleData   {
     this.date = date;
   }
 
+  public ArticleData userId(Integer userId) {
+    this.userId = userId;
+    return this;
+  }
+
+  /**
+   * 投稿ユーザID
+   * @return userId
+  **/
+  @ApiModelProperty(example = "32", value = "投稿ユーザID")
+
+
+  public Integer getUserId() {
+    return userId;
+  }
+
+  public void setUserId(Integer userId) {
+    this.userId = userId;
+  }
+
+  public ArticleData userName(String userName) {
+    this.userName = userName;
+    return this;
+  }
+
+  /**
+   * 投稿ユーザ名
+   * @return userName
+  **/
+  @ApiModelProperty(example = "サンプル太朗", value = "投稿ユーザ名")
+
+
+  public String getUserName() {
+    return userName;
+  }
+
+  public void setUserName(String userName) {
+    this.userName = userName;
+  }
+
   public ArticleData userIconPath(String userIconPath) {
     this.userIconPath = userIconPath;
     return this;
@@ -169,7 +218,7 @@ public class ArticleData   {
    * 記事内容のパス
    * @return contents
   **/
-  @ApiModelProperty(example = "/public/article/xxx", value = "記事内容のパス")
+  @ApiModelProperty(example = "/public/article_contents/xxx", value = "記事内容のパス")
 
 
   public String getContents() {
@@ -178,6 +227,26 @@ public class ArticleData   {
 
   public void setContents(String contents) {
     this.contents = contents;
+  }
+
+  public ArticleData opened(Boolean opened) {
+    this.opened = opened;
+    return this;
+  }
+
+  /**
+   * 公開済みか
+   * @return opened
+  **/
+  @ApiModelProperty(example = "true", value = "公開済みか")
+
+
+  public Boolean isOpened() {
+    return opened;
+  }
+
+  public void setOpened(Boolean opened) {
+    this.opened = opened;
   }
 
 
@@ -195,13 +264,16 @@ public class ArticleData   {
         Objects.equals(this.detail, articleData.detail) &&
         Objects.equals(this.imgPath, articleData.imgPath) &&
         Objects.equals(this.date, articleData.date) &&
+        Objects.equals(this.userId, articleData.userId) &&
+        Objects.equals(this.userName, articleData.userName) &&
         Objects.equals(this.userIconPath, articleData.userIconPath) &&
-        Objects.equals(this.contents, articleData.contents);
+        Objects.equals(this.contents, articleData.contents) &&
+        Objects.equals(this.opened, articleData.opened);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, title, detail, imgPath, date, userIconPath, contents);
+    return Objects.hash(id, title, detail, imgPath, date, userId, userName, userIconPath, contents, opened);
   }
 
   @Override
@@ -214,8 +286,11 @@ public class ArticleData   {
     sb.append("    detail: ").append(toIndentedString(detail)).append("\n");
     sb.append("    imgPath: ").append(toIndentedString(imgPath)).append("\n");
     sb.append("    date: ").append(toIndentedString(date)).append("\n");
+    sb.append("    userId: ").append(toIndentedString(userId)).append("\n");
+    sb.append("    userName: ").append(toIndentedString(userName)).append("\n");
     sb.append("    userIconPath: ").append(toIndentedString(userIconPath)).append("\n");
     sb.append("    contents: ").append(toIndentedString(contents)).append("\n");
+    sb.append("    opened: ").append(toIndentedString(opened)).append("\n");
     sb.append("}");
     return sb.toString();
   }

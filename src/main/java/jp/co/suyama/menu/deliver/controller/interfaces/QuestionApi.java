@@ -27,7 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.util.List;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-19T19:06:35.752+09:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-24T14:39:40.139+09:00")
 
 @Validated
 @Api(value = "question", description = "the question API")
@@ -40,6 +40,7 @@ public interface QuestionApi {
         @ApiResponse(code = 400, message = "200以外の時のは通信失敗をクライアントに通達") })
     @RequestMapping(value = "/question/answer",
         produces = { "application/json" }, 
+        consumes = { "multipart/form-data" },
         method = RequestMethod.POST)
     ResponseEntity<BasicResponse> answerQuestion(@ApiParam(value = "内容", required=true) @RequestParam(value="contents", required=true)  String contents,@ApiParam(value = "質問内容の画像") @Valid @RequestPart(value="file", required=true) MultipartFile file);
 
@@ -100,6 +101,7 @@ public interface QuestionApi {
         @ApiResponse(code = 400, message = "200以外の時のは通信失敗をクライアントに通達") })
     @RequestMapping(value = "/question",
         produces = { "application/json" }, 
+        consumes = { "multipart/form-data" },
         method = RequestMethod.POST)
     ResponseEntity<BasicResponse> postQuestion(@ApiParam(value = "内容", required=true) @RequestParam(value="contents", required=true)  String contents,@ApiParam(value = "質問内容の画像") @Valid @RequestPart(value="file", required=true) MultipartFile file);
 

@@ -10,7 +10,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * MenuCategoryData
+ * LoginParam
  */
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-24T14:39:40.139+09:00")
@@ -18,51 +18,51 @@ import javax.validation.constraints.*;
 
 
 
-public class MenuCategoryData   {
-  @JsonProperty("id")
-  private Integer id = null;
+public class LoginParam   {
+  @JsonProperty("email")
+  private String email = null;
 
-  @JsonProperty("name")
-  private String name = null;
+  @JsonProperty("password")
+  private String password = null;
 
-  public MenuCategoryData id(Integer id) {
-    this.id = id;
+  public LoginParam email(String email) {
+    this.email = email;
     return this;
   }
 
   /**
-   * 献立カテゴリID
-   * @return id
+   * メールアドレス
+   * @return email
   **/
-  @ApiModelProperty(example = "1", value = "献立カテゴリID")
+  @ApiModelProperty(example = "aaa.bbb@gmail.com", value = "メールアドレス")
 
 
-  public Integer getId() {
-    return id;
+  public String getEmail() {
+    return email;
   }
 
-  public void setId(Integer id) {
-    this.id = id;
+  public void setEmail(String email) {
+    this.email = email;
   }
 
-  public MenuCategoryData name(String name) {
-    this.name = name;
+  public LoginParam password(String password) {
+    this.password = password;
     return this;
   }
 
   /**
-   * 献立カテゴリ名
-   * @return name
+   * ログインパスワード
+   * @return password
   **/
-  @ApiModelProperty(example = "減塩", value = "献立カテゴリ名")
+  @ApiModelProperty(example = "xxxxxxxxxx", value = "ログインパスワード")
 
 
-  public String getName() {
-    return name;
+  public String getPassword() {
+    return password;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setPassword(String password) {
+    this.password = password;
   }
 
 
@@ -74,23 +74,23 @@ public class MenuCategoryData   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    MenuCategoryData menuCategoryData = (MenuCategoryData) o;
-    return Objects.equals(this.id, menuCategoryData.id) &&
-        Objects.equals(this.name, menuCategoryData.name);
+    LoginParam loginParam = (LoginParam) o;
+    return Objects.equals(this.email, loginParam.email) &&
+        Objects.equals(this.password, loginParam.password);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name);
+    return Objects.hash(email, password);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class MenuCategoryData {\n");
+    sb.append("class LoginParam {\n");
     
-    sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    email: ").append(toIndentedString(email)).append("\n");
+    sb.append("    password: ").append(toIndentedString(password)).append("\n");
     sb.append("}");
     return sb.toString();
   }
