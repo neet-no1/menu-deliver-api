@@ -16,7 +16,7 @@ public interface UsersMapperImpl extends UsersMapper {
     // @formatter:off
     @Select({
           "insert into users"
-        , "(email, password, name, available, once_password, expires, deleted, created_at, updated_at)"
+        , "(email, password, role, available, once_password, expires, deleted, created_at, updated_at)"
         , "values"
         , "("
         , "  #{email,jdbcType=VARCHAR},"
