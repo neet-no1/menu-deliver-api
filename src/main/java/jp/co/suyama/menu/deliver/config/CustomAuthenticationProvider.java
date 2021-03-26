@@ -2,12 +2,9 @@ package jp.co.suyama.menu.deliver.config;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -17,11 +14,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
-import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 
 import jp.co.suyama.menu.deliver.exception.EmptyAuthenticationException;
 import jp.co.suyama.menu.deliver.mapper.UsersMapperImpl;
@@ -108,22 +101,5 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         authorityList.add(new SimpleGrantedAuthority(users.getRole()));
 
         return new UsernamePasswordAuthenticationToken(loginEmail, users.getPassword(), authorityList);
-    }
-
-    /**
-     * パスワードエンコーダーを生成
-     */
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        // pbkdf2を使用
-        String idForEncode = "pbkdf2";
-
-        // エンコーダー一覧を作成
-        Map<String, PasswordEncoder> encoders = new HashMap<>();
-        encoders.put(idForEncode, new BCryptPasswordEncoder());
-        encoders.put("pbkdf2", new Pbkdf2PasswordEncoder());
-        encoders.put("scrypt", new SCryptPasswordEncoder());
-
-        return new DelegatingPasswordEncoder(idForEncode, encoders);
     }
 }
