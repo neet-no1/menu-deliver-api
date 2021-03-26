@@ -27,7 +27,6 @@ import jp.co.suyama.menu.deliver.exception.EmptyAuthenticationException;
 import jp.co.suyama.menu.deliver.mapper.UsersMapperImpl;
 import jp.co.suyama.menu.deliver.model.db.Users;
 
-
 /**
  * <pre>
  * Spring Securityの認証処理の実装
@@ -99,6 +98,11 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
         if (users.getRole() == null) {
             throw new BadCredentialsException("権限が設定されていません。");
+        }
+
+        // メールアドレス認証を確認
+        if (!users.getAvailable().booleanValue()) {
+            throw new BadCredentialsException("メールアドレスが認証されていません。");
         }
 
         authorityList.add(new SimpleGrantedAuthority(users.getRole()));
