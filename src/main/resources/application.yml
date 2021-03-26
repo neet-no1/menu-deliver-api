@@ -8,11 +8,28 @@ spring:
 server:
   port: 48080
   servlet:
-    context-path: /
+    context-path: /api
 
 logging:
   level:
-    com:
-      varie:
-        api:
-          mapper: DEBUG
+    jp.co.suyama.menu.deliver.mapper: DEBUG
+
+---
+spring:
+  profiles: development
+
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://${RDS_HOSTNAME}:${RDS_PORT}/${RDS_DB_NAME}
+    username: ${RDS_USERNAME}
+    password: ${RDS_PASSWORD}
+
+---
+spring:
+  profiles: product
+
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://${RDS_HOSTNAME}:${RDS_PORT}/${RDS_DB_NAME}
+    username: ${RDS_USERNAME}
+    password: ${RDS_PASSWORD}
