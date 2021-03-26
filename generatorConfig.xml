@@ -33,6 +33,7 @@
 		<table tableName="answers" />
 		<table tableName="answer_images" />
 		<table tableName="compositions" />
+		<table tableName="bounce" />
 
 	</context>
 </generatorConfiguration>

@@ -64,6 +64,20 @@
 			<optional>true</optional>
 		</dependency>
 
+		<!-- Velocity -->
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity</artifactId>
+			<version>1.7</version>
+		</dependency>
+
+		<!-- AWS SES -->
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-ses</artifactId>
+			<version>1.11.983</version>
+		</dependency>
+
 		<!--SpringFox dependencies -->
 		<dependency>
 			<groupId>io.springfox</groupId>

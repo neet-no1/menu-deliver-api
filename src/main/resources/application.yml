@@ -14,6 +14,15 @@ logging:
   level:
     jp.co.suyama.menu.deliver.mapper: DEBUG
 
+mail:
+  from: info@menu-deliver.work
+
+aws:
+  accessKeyId: ${AWS_ACCESS_KEY_ID}
+  secretKey: ${AWS_SECRET_ACCESS_KEY}
+
+domain: menu-deliver.work
+
 ---
 spring:
   profiles: development
@@ -24,6 +33,9 @@ spring:
     username: ${RDS_USERNAME}
     password: ${RDS_PASSWORD}
 
+mail:
+  from: info@menu-deliver.work
+
 ---
 spring:
   profiles: product
@@ -33,3 +45,8 @@ spring:
     url: jdbc:postgresql://${RDS_HOSTNAME}:${RDS_PORT}/${RDS_DB_NAME}
     username: ${RDS_USERNAME}
     password: ${RDS_PASSWORD}
+
+mail:
+  from: info@menu-deliver.com
+
+domain: menu-deliver.com
