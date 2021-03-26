@@ -3,6 +3,8 @@ package jp.co.suyama.menu.deliver.controller.impl;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,9 @@ import jp.co.suyama.menu.deliver.utils.ParameterCheckUtils;
 
 @RestController
 public class AccountController implements AccountApi {
+
+    // ロガー
+    private Logger log = LoggerFactory.getLogger(AccountController.class);
 
     /**
      * アカウントサービス
@@ -91,6 +96,8 @@ public class AccountController implements AccountApi {
             response.setCode(MenuDeliverStatus.FAILED);
             ErrorInfo error = new ErrorInfo();
             error.setErrorMessage("メールアドレスの形式が不正です。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
 
         // パスワードが一致するかチェック
@@ -99,6 +106,8 @@ public class AccountController implements AccountApi {
             response.setCode(MenuDeliverStatus.FAILED);
             ErrorInfo error = new ErrorInfo();
             error.setErrorMessage("パスワードの形式が不正です。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
 
         // パスワードが一致するかチェック
@@ -107,6 +116,8 @@ public class AccountController implements AccountApi {
             response.setCode(MenuDeliverStatus.FAILED);
             ErrorInfo error = new ErrorInfo();
             error.setErrorMessage("パスワードが一致しません。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
 
         // パスワードをエンコードする
