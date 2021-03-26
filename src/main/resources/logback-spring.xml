@@ -10,10 +10,10 @@
 
     <!-- ファイルA出力用設定 -->
     <appender name="FILE_A" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>/var/log/va-rie-api/va-rie-api.log</file>
+        <file>/var/log/mane-deliver/menu-deliver-api.log</file>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>/var/log/va-rie-api/va-rie-api.log.%d{yyyy-MM-dd}</fileNamePattern>
+            <fileNamePattern>/var/log/mane-deliver/menu-deliver-api.log.%d{yyyy-MM-dd}</fileNamePattern>
             <!-- %d{yyyy-MM-dd}の設定によって、自動でローテーションがトリガされる。日まで指定すると、毎日ローテーション。 -->
 
             <!-- 最大３０日間保存 -->
