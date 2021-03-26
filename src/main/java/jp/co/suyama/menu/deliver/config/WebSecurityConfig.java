@@ -18,7 +18,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     // 認証不要でアクセスできるパス
-    private static final String[] NO_AUTH_PATH = { "/product/**", "/category/**" };
+    // 例) category配下は認証不要 -> "/category/**"
+    private static final String[] NO_AUTH_PATH = {};
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -31,7 +32,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // 特定のパスは特定の権限のみアクセス可能
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 // その他は全て認証が必要
-                .anyRequest().authenticated()
+                // .anyRequest().authenticated()
                 .and()
             // フォームベースの認証
             .formLogin()
