@@ -3,8 +3,6 @@ package jp.co.suyama.menu.deliver.controller.impl;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import jp.co.suyama.menu.deliver.common.MenuDeliverStatus;
 import jp.co.suyama.menu.deliver.controller.interfaces.AccountApi;
 import jp.co.suyama.menu.deliver.model.auto.AccountAuthResponse;
+import jp.co.suyama.menu.deliver.model.auto.AccountData;
 import jp.co.suyama.menu.deliver.model.auto.AccountResponse;
 import jp.co.suyama.menu.deliver.model.auto.ArticlesResponse;
 import jp.co.suyama.menu.deliver.model.auto.BasicResponse;
@@ -30,9 +29,6 @@ import jp.co.suyama.menu.deliver.utils.ParameterCheckUtils;
 
 @RestController
 public class AccountController implements AccountApi {
-
-    // ロガー
-    private Logger log = LoggerFactory.getLogger(AccountController.class);
 
     /**
      * アカウントサービス
@@ -73,8 +69,28 @@ public class AccountController implements AccountApi {
 
     @Override
     public ResponseEntity<AccountResponse> getAccountInfo() {
-        // TODO 自動生成されたメソッド・スタブ
-        return null;
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        // レスポンス作成
+        AccountResponse response = new AccountResponse();
+
+        if ("anonymousUser".equals(auth.getPrincipal().toString())) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("ログインされていません。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // アカウント情報取得
+        AccountData data = accountService.getAccountInfo(auth.getPrincipal().toString());
+
+        // レスポンスに情報を設定
+        response.setCode(MenuDeliverStatus.SUCCESS);
+        response.setInfo(data);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Override

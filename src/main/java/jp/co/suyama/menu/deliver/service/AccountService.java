@@ -25,6 +25,7 @@ import jp.co.suyama.menu.deliver.common.Role;
 import jp.co.suyama.menu.deliver.exception.MenuDeliverException;
 import jp.co.suyama.menu.deliver.mapper.BounceMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.UsersMapperImpl;
+import jp.co.suyama.menu.deliver.model.auto.AccountData;
 import jp.co.suyama.menu.deliver.model.db.Bounce;
 import jp.co.suyama.menu.deliver.model.db.Users;
 
@@ -37,7 +38,7 @@ public class AccountService {
 
     // AWS SESのクライアント
     @Autowired
-    AmazonSimpleEmailService sesClient;
+    private AmazonSimpleEmailService sesClient;
 
     // メール件名
     private static final String SUBJECT = "メールアドレス認証";
@@ -125,5 +126,30 @@ public class AccountService {
         // ログに記録する
         log.info("Regist Account: userId:[{}] messageId:[{}] requestId:[{}]", userId, mailResult.getMessageId(),
                 mailResult.getSdkResponseMetadata().getRequestId());
+    }
+
+    /**
+     * アカウント情報を取得
+     *
+     * @param email メールアドレス
+     * @return アカウント情報
+     */
+    public AccountData getAccountInfo(String email) {
+
+        // ユーザ情報取得
+        Users user = usersMapper.selectEmail(email);
+
+        // 存在していない場合エラー
+        if (user == null) {
+            throw new MenuDeliverException("ユーザが存在しません。");
+        }
+
+        AccountData data = new AccountData();
+        data.setId(user.getId());
+        data.setImgPath(user.getIcon());
+        data.setName(user.getName());
+        data.setEmail(user.getEmail());
+
+        return data;
     }
 }
