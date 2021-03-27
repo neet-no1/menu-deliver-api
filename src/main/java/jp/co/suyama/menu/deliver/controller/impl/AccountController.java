@@ -45,8 +45,27 @@ public class AccountController implements AccountApi {
 
     @Override
     public ResponseEntity<BasicResponse> emailConfirm(@NotNull @Valid String oneTimePassword) {
-        // TODO 自動生成されたメソッド・スタブ
-        return new ResponseEntity<>(new BasicResponse(), HttpStatus.OK);
+
+        // レスポンス作成
+        BasicResponse response = new BasicResponse();
+
+        // ワンタイムパスワード存在チェック
+        if (oneTimePassword == null) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("ワンタイムパスワードが空です。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // メールアドレス有効性確認
+        accountService.checkEmailAvailable(oneTimePassword);
+
+        // レスポンスに情報を設定
+        response.setCode(MenuDeliverStatus.SUCCESS);
+        response.setInfo(MenuDeliverStatus.SUCCESS);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Override
@@ -162,7 +181,7 @@ public class AccountController implements AccountApi {
 
     @Override
     public ResponseEntity<BasicResponse> updateAccountInfo(String name, String email, @Valid MultipartFile icon) {
-        // TODO 自動生成されたメソッド・スタブ
+
         return null;
     }
 

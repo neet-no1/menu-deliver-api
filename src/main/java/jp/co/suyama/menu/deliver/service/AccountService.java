@@ -2,6 +2,7 @@ package jp.co.suyama.menu.deliver.service;
 
 import java.io.StringWriter;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.UUID;
 
 import org.apache.velocity.VelocityContext;
@@ -151,5 +152,35 @@ public class AccountService {
         data.setEmail(user.getEmail());
 
         return data;
+    }
+
+    /**
+     * メールアドレスの有効性を確認する
+     *
+     * @param otp ワンタイムパスワード
+     */
+    public void checkEmailAvailable(String otp) {
+
+        // ワンタイムパスワードを元にユーザ情報を取得する
+        Users user = usersMapper.selectByOncePassword(otp);
+
+        // ユーザが存在しない場合エラー
+        if (user == null) {
+            throw new MenuDeliverException("ユーザが存在しません。");
+        }
+
+        // 有効期限が切れていないか確認
+        Date expires = user.getExpires();
+        Date now = new Date();
+        if (expires.before(now)) {
+            // 有効期限が切れている場合はエラー
+            throw new MenuDeliverException("有効期限が切れています。");
+        }
+
+        // メールアドレス有効性をtrueに設定する
+        user.setAvailable(true);
+
+        // ユーザ情報を更新する
+        usersMapper.updateUser(user);
     }
 }
