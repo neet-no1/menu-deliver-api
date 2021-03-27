@@ -231,6 +231,34 @@ public class AccountService {
             File file = ConvertUtils.convertFile(icon);
             s3Access.uploadUserIcon(iconPath, file);
         }
+    }
 
+    /**
+     * パスワード更新
+     *
+     * @param email           メールアドレス
+     * @param currentPassword 現在のパスワード
+     * @param newPassword     新しいパスワード
+     */
+    public void updatePassword(String email, String currentPassword, String newPassword) {
+
+        // ユーザを取得
+        Users user = usersMapper.selectEmail(email);
+
+        // ユーザが存在しない場合エラー
+        if (user == null) {
+            throw new MenuDeliverException("ユーザが存在しません。");
+        }
+
+        // 現在パスワードを比較
+        if (!currentPassword.equals(user.getPassword())) {
+            throw new MenuDeliverException("現在のパスワードが違います。");
+        }
+
+        // 新しいパスワード設定する
+        user.setPassword(newPassword);
+
+        // 更新
+        usersMapper.updateUser(user);
     }
 }

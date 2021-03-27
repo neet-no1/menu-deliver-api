@@ -238,8 +238,72 @@ public class AccountController implements AccountApi {
 
     @Override
     public ResponseEntity<BasicResponse> updatePassword(@Valid UpdatePasswordParam updatePasswordParam) {
-        // TODO 自動生成されたメソッド・スタブ
-        return null;
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        // レスポンス作成
+        BasicResponse response = new BasicResponse();
+
+        // ログインチェック
+        if (MenuDeliverConstants.UNKNOWN_USER_NAME.equals(auth.getPrincipal().toString())) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("ログインされていません。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // 現在パスワード存在チェック
+        String currentPassword = updatePasswordParam.getCurrentPassword();
+        if (StringUtils.isEmpty(currentPassword)) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("現在のパスワードが空です。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // 新しいパスワード存在チェック
+        String newPassword = updatePasswordParam.getNewPassword();
+        if (StringUtils.isEmpty(newPassword)) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("新しいパスワードが空です。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // 新しいパスワード再確認存在チェック
+        String newPasswordConfirm = updatePasswordParam.getNewPasswordConfirm();
+        if (StringUtils.isEmpty(newPasswordConfirm)) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("新しいパスワード再確認が空です。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // パスワード一致確認
+        if (!newPassword.equals(newPasswordConfirm)) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("新しいパスワードが一致しません。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // パスワードをエンコードする
+        String encodedCurrentPassword = passwordEncoder.encode(currentPassword);
+        String encodedNewPassword = passwordEncoder.encode(newPassword);
+
+        // パスワードを更新
+        accountService.updatePassword(auth.getPrincipal().toString(), encodedCurrentPassword, encodedNewPassword);
+
+        // レスポンスに情報を設定
+        response.setCode(MenuDeliverStatus.SUCCESS);
+        response.setInfo(MenuDeliverStatus.SUCCESS);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }
