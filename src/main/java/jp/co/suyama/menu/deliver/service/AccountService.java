@@ -1,5 +1,6 @@
 package jp.co.suyama.menu.deliver.service;
 
+import java.io.File;
 import java.io.StringWriter;
 import java.util.Calendar;
 import java.util.Date;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.model.Body;
@@ -22,13 +24,17 @@ import com.amazonaws.services.simpleemail.model.Message;
 import com.amazonaws.services.simpleemail.model.SendEmailRequest;
 import com.amazonaws.services.simpleemail.model.SendEmailResult;
 
+import jp.co.suyama.menu.deliver.common.MenuDeliverConstants;
 import jp.co.suyama.menu.deliver.common.Role;
+import jp.co.suyama.menu.deliver.common.S3Access;
 import jp.co.suyama.menu.deliver.exception.MenuDeliverException;
 import jp.co.suyama.menu.deliver.mapper.BounceMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.UsersMapperImpl;
 import jp.co.suyama.menu.deliver.model.auto.AccountData;
 import jp.co.suyama.menu.deliver.model.db.Bounce;
 import jp.co.suyama.menu.deliver.model.db.Users;
+import jp.co.suyama.menu.deliver.utils.ConvertUtils;
+import jp.co.suyama.menu.deliver.utils.PathUtils;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -36,6 +42,10 @@ public class AccountService {
 
     // ロガー
     private Logger log = LoggerFactory.getLogger(AccountService.class);
+
+    // S3アクセス
+    @Autowired
+    private S3Access s3Access;
 
     // AWS SESのクライアント
     @Autowired
@@ -182,5 +192,45 @@ public class AccountService {
 
         // ユーザ情報を更新する
         usersMapper.updateUser(user);
+    }
+
+    /**
+     * アカウント情報更新
+     *
+     * @param name          ニックネーム
+     * @param email         メールアドレス
+     * @param icon          アイコン
+     * @param previousEmail 現在のメールアドレス
+     */
+    public void updateAccountInfo(String name, String email, MultipartFile icon, String previousEmail) {
+
+        // ユーザを取得
+        Users user = usersMapper.selectEmail(previousEmail);
+
+        // ユーザが存在しない場合エラー
+        if (user == null) {
+            throw new MenuDeliverException("ユーザが存在しません。");
+        }
+
+        // アイコンのパスを取得
+        String iconPath = MenuDeliverConstants.NO_IMAGE_USER_ICON;
+
+        if (icon != null) {
+            iconPath = PathUtils.createUserIconPath(user.getId(), previousEmail);
+        }
+
+        // ユーザ情報を更新
+        user.setEmail(email);
+        user.setName(name);
+        user.setIcon(iconPath);
+
+        usersMapper.updateUser(user);
+
+        // ユーザアイコンをS3にアップロードする
+        if (icon != null) {
+            File file = ConvertUtils.convertFile(icon);
+            s3Access.uploadUserIcon(iconPath, file);
+        }
+
     }
 }

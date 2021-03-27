@@ -35,6 +35,13 @@ public class PathUtils {
         return menusId + "_" + encodeUrl(encrypt(fileName));
     }
 
+    /**
+     * ユーザアイコンのパスを生成する
+     */
+    public static String createUserIconPath(int userId, String email) {
+        return userId + "_" + encodeUrl(encrypt(email));
+    }
+
     private static String encodeUrl(String param) {
         URLCodec codec = new URLCodec("UTF-8");
         try {

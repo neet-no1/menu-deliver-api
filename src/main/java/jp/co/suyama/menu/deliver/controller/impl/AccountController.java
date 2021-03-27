@@ -3,6 +3,7 @@ package jp.co.suyama.menu.deliver.controller.impl;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -93,6 +94,7 @@ public class AccountController implements AccountApi {
         // レスポンス作成
         AccountResponse response = new AccountResponse();
 
+        // ログインチェック
         if (MenuDeliverConstants.UNKNOWN_USER_NAME.equals(auth.getPrincipal().toString())) {
             response.setCode(MenuDeliverStatus.FAILED);
             ErrorInfo error = new ErrorInfo();
@@ -182,7 +184,56 @@ public class AccountController implements AccountApi {
     @Override
     public ResponseEntity<BasicResponse> updateAccountInfo(String name, String email, @Valid MultipartFile icon) {
 
-        return null;
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        // レスポンス作成
+        BasicResponse response = new BasicResponse();
+
+        // ログインチェック
+        if (MenuDeliverConstants.UNKNOWN_USER_NAME.equals(auth.getPrincipal().toString())) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("ログインされていません。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // ニックネーム存在チェック
+        if (StringUtils.isEmpty(name)) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("ニックネームが空です。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // メールアドレス存在チェック
+        if (StringUtils.isEmpty(email)) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("メールアドレスが空です。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // メールアドレス形式チェック
+        if (!ParameterCheckUtils.checkEmail(email)) {
+            // チェックで失敗した場合
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("メールアドレスの形式が不正です。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // アカウント情報更新
+        accountService.updateAccountInfo(name, email, icon, auth.getPrincipal().toString());
+
+        // レスポンスに情報を設定
+        response.setCode(MenuDeliverStatus.SUCCESS);
+        response.setInfo(MenuDeliverStatus.SUCCESS);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Override

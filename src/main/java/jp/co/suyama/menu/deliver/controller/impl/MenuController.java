@@ -86,6 +86,7 @@ public class MenuController implements MenuApi {
         // レスポンス作成
         BasicResponse response = new BasicResponse();
 
+        // ログインチェック
         if (MenuDeliverConstants.UNKNOWN_USER_NAME.equals(auth.getPrincipal().toString())) {
             response.setCode(MenuDeliverStatus.FAILED);
             ErrorInfo error = new ErrorInfo();
