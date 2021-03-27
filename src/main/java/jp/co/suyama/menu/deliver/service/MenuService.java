@@ -9,16 +9,11 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.DeleteObjectsRequest;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import jp.co.suyama.menu.deliver.common.MenuDeliverConstants;
+import jp.co.suyama.menu.deliver.common.S3Access;
 import jp.co.suyama.menu.deliver.exception.MenuDeliverException;
 import jp.co.suyama.menu.deliver.mapper.MenuCategoriesMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.MenuDetailsMapperImpl;
@@ -37,16 +32,9 @@ import jp.co.suyama.menu.deliver.utils.PathUtils;
 @Transactional(rollbackFor = Exception.class)
 public class MenuService {
 
-    // バケット名
-    @Value("${aws.s3.bucket}")
-    private String bucket;
-
-    // S3クライアント
+    // S3アクセス
     @Autowired
-    private AmazonS3 s3;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+    private S3Access s3Access;
 
     // 献立テーブル
     @Autowired
@@ -230,13 +218,13 @@ public class MenuService {
         // サムネイルファイルをS3にアップロードする
         if (thumb != null) {
             File thumbFile = ConvertUtils.convertFile(thumb);
-            s3.putObject(bucket, MenuDeliverConstants.MENU_IMAGE_PATH + thumbPath, thumbFile);
+            s3Access.uploadMenuImage(thumbPath, thumbFile);
         }
 
         // 作り方ファイルをS3にアップロードする
         for (Entry<String, MultipartFile> filePath : filePaths.entrySet()) {
             File file = ConvertUtils.convertFile(filePath.getValue());
-            s3.putObject(bucket, MenuDeliverConstants.MENU_IMAGE_PATH + filePath.getKey(), file);
+            s3Access.uploadMenuImage(filePath.getKey(), file);
         }
 
         // 献立と作り方をまとめてS3にアップロードする
@@ -245,19 +233,12 @@ public class MenuService {
             contentsMap.put("contents", contents);
             contentsMap.put("cookery", cookery);
 
-            try {
-                s3.putObject(bucket, MenuDeliverConstants.MENU_DETAIL_PATH + contentsPath,
-                        objectMapper.writeValueAsString(contentsMap));
-            } catch (Exception e) {
-                // アップロード時にエラー
-                throw new MenuDeliverException("アップロードが失敗しました。", e);
-            }
+            s3Access.uploadMenuDetail(contentsPath, contentsMap);
         }
 
         // 献立画像を削除
         if (!deletePath.isEmpty()) {
-            DeleteObjectsRequest dor = new DeleteObjectsRequest(bucket).withKeys(deletePath.toArray(new String[] {}));
-            s3.deleteObjects(dor);
+            s3Access.deleteMenuImages(deletePath);
         }
 
     }

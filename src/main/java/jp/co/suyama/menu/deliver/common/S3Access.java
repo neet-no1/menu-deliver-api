@@ -1,12 +1,18 @@
 package jp.co.suyama.menu.deliver.common;
 
 import java.io.File;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.DeleteObjectsRequest;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jp.co.suyama.menu.deliver.exception.MenuDeliverException;
 
 @Component
 public class S3Access {
@@ -19,6 +25,9 @@ public class S3Access {
     @Autowired
     private AmazonS3 s3;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     /**
      * ユーザアイコンをS3にアップロードする
      *
@@ -27,5 +36,41 @@ public class S3Access {
      */
     public void uploadUserIcon(String key, File file) {
         s3.putObject(bucket, MenuDeliverConstants.USER_ICON_PATH + key, file);
+    }
+
+    /**
+     * 献立画像をS3にアップロードする
+     *
+     * @param key  オブジェクトキー
+     * @param file 献立画像
+     */
+    public void uploadMenuImage(String key, File file) {
+        s3.putObject(bucket, MenuDeliverConstants.MENU_IMAGE_PATH + key, file);
+    }
+
+    /**
+     * 献立内容をS3にアップロードする
+     *
+     * @param key      オブジェクトキー
+     * @param contents 献立内容
+     */
+    public void uploadMenuDetail(String key, Map<String, String> contents) {
+        try {
+            s3.putObject(bucket, MenuDeliverConstants.MENU_DETAIL_PATH + key,
+                    objectMapper.writeValueAsString(contents));
+        } catch (Exception e) {
+            // アップロード時にエラー
+            throw new MenuDeliverException("アップロードが失敗しました。", e);
+        }
+    }
+
+    /**
+     * 献立画像を複数削除する
+     *
+     * @param keys オブジェクトキーリスト
+     */
+    public void deleteMenuImages(List<String> keys) {
+        DeleteObjectsRequest dor = new DeleteObjectsRequest(bucket).withKeys(keys.toArray(new String[] {}));
+        s3.deleteObjects(dor);
     }
 }
