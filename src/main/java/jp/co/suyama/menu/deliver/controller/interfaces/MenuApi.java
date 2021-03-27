@@ -11,7 +11,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -108,7 +107,6 @@ public interface MenuApi {
             @ApiParam(value = "献立のサムネイル画像") @Valid @RequestPart(value = "thumb", required = false) MultipartFile thumb,
             @ApiParam(value = "作り方") @RequestParam(value = "cookery", required = false) String cookery,
             @ApiParam(value = "ファイルリスト") @RequestParam(value = "files", required = false) List<MultipartFile> files,
-            @ApiParam(value = "ファイルの説明") @RequestParam(value = "filesDescription", required = false) List<String> filesDescription,
-            Authentication authentication);
+            @ApiParam(value = "ファイルの説明") @RequestParam(value = "filesDescription", required = false) List<String> filesDescription);
 
 }

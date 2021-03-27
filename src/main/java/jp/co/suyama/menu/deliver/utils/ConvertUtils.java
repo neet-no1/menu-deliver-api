@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,7 +16,7 @@ public class ConvertUtils {
      * MultipartFileをFileに変換する
      */
     public static File convertFile(MultipartFile file) {
-        File convFile = new File(file.getOriginalFilename());
+        File convFile = new File("/tmp/" + file.getOriginalFilename());
 
         try {
             convFile.createNewFile();
@@ -24,7 +25,7 @@ public class ConvertUtils {
         }
 
         try (InputStream is = file.getInputStream()) {
-            Files.copy(is, convFile.toPath());
+            Files.copy(is, convFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new MenuDeliverException("ファイルコピーに失敗しました。", e);
         }

@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -53,9 +55,19 @@ public class AccountController implements AccountApi {
     @Override
     public ResponseEntity<AccountAuthResponse> getAccountAuth() {
         // TODO 自動生成されたメソッド・スタブ
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
         AccountAuthResponse response = new AccountAuthResponse();
         response.setCode(MenuDeliverStatus.SUCCESS);
-        response.setInfo(true);
+
+        System.out.println(auth.getPrincipal().toString());
+
+        if ("anonymousUser".equals(auth.getPrincipal())) {
+            response.setInfo(false);
+        } else {
+            response.setInfo(true);
+        }
+
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

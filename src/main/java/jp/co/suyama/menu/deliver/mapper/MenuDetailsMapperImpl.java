@@ -15,13 +15,12 @@ public interface MenuDetailsMapperImpl extends MenuDetailsMapper {
      */
     // @formatter:off
     @Insert({
-          "insert info menu_details"
-        , "(menu_id, path, description, created_at, updated_at)"
+          "insert into menu_details"
+        , "(menu_id, path, created_at, updated_at)"
         , "values"
         , "("
         , "  #{menuId,jdbcType=INTEGER},"
         , "  #{path,jdbcType=VARCHAR},"
-        , "  #{description,jdbcType=VARCHAR},"
         , "  current_timestamp,"
         , "  current_timestamp"
         , ")"
@@ -41,7 +40,7 @@ public interface MenuDetailsMapperImpl extends MenuDetailsMapper {
         , "  *"
         , "from menu_details"
         , "where"
-        , "  menu_id = #{menuId,jdbcType=INTEGER},"
+        , "  menu_id = #{menuId,jdbcType=INTEGER}"
     })
     // @formatter:on
     public MenuDetails selectByMenusId(@Param("menuId") int menuId);

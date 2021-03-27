@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import jp.co.suyama.menu.deliver.common.MenuDeliverStatus;
@@ -24,6 +26,7 @@ import jp.co.suyama.menu.deliver.model.auto.MenuDataResponse;
 import jp.co.suyama.menu.deliver.model.auto.MenusResponse;
 import jp.co.suyama.menu.deliver.service.MenuService;
 
+@RestController
 public class MenuController implements MenuApi {
 
     // 献立サービス
@@ -75,10 +78,20 @@ public class MenuController implements MenuApi {
     @Override
     public ResponseEntity<BasicResponse> postMenu(Integer id, String title, Integer category, String contents,
             Boolean opened, String subTitle, @Valid MultipartFile thumb, String cookery, List<MultipartFile> files,
-            List<String> filesDescription, Authentication authentication) {
+            List<String> filesDescription) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         // レスポンス作成
         BasicResponse response = new BasicResponse();
+
+        if ("anonymousUser".equals(auth.getPrincipal().toString())) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("ログインされていません。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
 
         // IDの存在チェック
         if (id == null) {
@@ -136,7 +149,7 @@ public class MenuController implements MenuApi {
 
         // 献立投稿処理
         menuService.postMenu(id.intValue(), title, subTitle, category.intValue(), contents, thumb, cookery, files,
-                filesDescription, opened.booleanValue(), authentication.getPrincipal().toString());
+                filesDescription, opened.booleanValue(), auth.getPrincipal().toString());
 
         // レスポンスに情報を設定
         response.setCode(MenuDeliverStatus.SUCCESS);

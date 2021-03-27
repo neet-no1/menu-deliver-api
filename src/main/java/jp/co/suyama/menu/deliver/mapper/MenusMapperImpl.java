@@ -14,7 +14,7 @@ public interface MenusMapperImpl extends MenusMapper {
      */
     // @formatter:off
     @Select({
-          "insert info menus"
+          "insert into menus"
         , "(user_id, title, sub_title, category_id, opened, created_at, updated_at)"
         , "values"
         , "("
@@ -42,6 +42,7 @@ public interface MenusMapperImpl extends MenusMapper {
         , "title = #{title,jdbcType=VARCHAR},"
         , "sub_title = #{subTitle,jdbcType=VARCHAR},"
         , "category_id = #{categoryId,jdbcType=INTEGER},"
+        , "path = #{path,jdbcType=VARCHAR},"
         , "opened = #{opened,jdbcType=BIT},"
         , "updated_at = current_timestamp"
         , "where id = #{id,jdbcType=INTEGER}"

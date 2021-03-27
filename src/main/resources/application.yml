@@ -4,6 +4,16 @@ spring:
     url: jdbc:postgresql://localhost:5432/menu_deliver
     username: postgres
     password: postgres
+  servlet:
+    multipart:
+      # デフォルトのMultipartResolverの有効性
+      enabled: true
+      # アップロード時の1つのファイルサイズの上限
+      max-file-size: 20MB
+      # リクエストの全体のサイズの上限
+      max-request-size: 100MB
+      # アップロードしたファイルがサーバーのディスクに書き込まれるファイルサイズの閾値
+      file-size-threshold: 50MB
 
 server:
   port: 48080

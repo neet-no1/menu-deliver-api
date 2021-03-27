@@ -41,7 +41,9 @@ public class AWSConfig {
      */
     @Bean
     public AmazonS3 amazonS3Client() {
-        AmazonS3 s3 = AmazonS3ClientBuilder.standard().withRegion(Regions.AP_NORTHEAST_1).build();
+        BasicAWSCredentials awsCreds = new BasicAWSCredentials(accessKey, secretKey);
+        AmazonS3 s3 = AmazonS3ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(awsCreds))
+                .withRegion(Regions.AP_NORTHEAST_1).build();
 
         return s3;
     }

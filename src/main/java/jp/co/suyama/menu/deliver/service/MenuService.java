@@ -22,10 +22,12 @@ import jp.co.suyama.menu.deliver.mapper.MenuCategoriesMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.MenuDetailsMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.MenuPicturesMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.MenusMapperImpl;
+import jp.co.suyama.menu.deliver.mapper.UsersMapperImpl;
 import jp.co.suyama.menu.deliver.model.db.MenuCategories;
 import jp.co.suyama.menu.deliver.model.db.MenuDetails;
 import jp.co.suyama.menu.deliver.model.db.MenuPictures;
 import jp.co.suyama.menu.deliver.model.db.Menus;
+import jp.co.suyama.menu.deliver.model.db.Users;
 import jp.co.suyama.menu.deliver.utils.ConvertUtils;
 import jp.co.suyama.menu.deliver.utils.PathUtils;
 
@@ -59,6 +61,10 @@ public class MenuService {
     // 献立カテゴリテーブル
     @Autowired
     private MenuCategoriesMapperImpl menuCategoriesMapper;
+
+    // ユーザテーブル
+    @Autowired
+    private UsersMapperImpl usersMapper;
 
     /**
      * 献立を投稿する
@@ -96,13 +102,20 @@ public class MenuService {
             throw new MenuDeliverException("カテゴリが存在しません。");
         }
 
+        // ユーザID取得
+        Users users = usersMapper.selectEmail(email);
+        if (users == null) {
+            // ユーザが存在しない場合はエラー
+            throw new MenuDeliverException("ユーザが存在しません。");
+        }
+
         // 献立テーブルを登録・更新する
         Menus menus = new Menus();
-        menus.setId(id);
         menus.setTitle(title);
         menus.setSubTitle(subTitle);
         menus.setCategoryId(categoryId);
         menus.setOpened(opened);
+        menus.setUserId(users.getId());
 
         if (id == 0) {
             // IDが0の場合は登録
@@ -130,6 +143,11 @@ public class MenuService {
             if (existMenus == null) {
                 // DBに対象が存在しない場合はエラー
                 throw new MenuDeliverException("更新対象が存在しません。");
+            }
+
+            // 更新対象が自分のものか確認
+            if (existMenus.getUserId() != users.getId()) {
+                throw new MenuDeliverException("更新対象が自分のものではありません。");
             }
 
             // サムネイル画像がある場合

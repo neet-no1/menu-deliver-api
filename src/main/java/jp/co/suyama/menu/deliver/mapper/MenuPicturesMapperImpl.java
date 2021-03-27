@@ -12,7 +12,7 @@ public interface MenuPicturesMapperImpl extends MenuPicturesMapper {
      */
     // @formatter:off
     @Insert({
-          "insert info menu_pictures"
+          "insert into menu_pictures"
         , "(menu_id, path, order_of, created_at, updated_at)"
         , "values"
         , "("
