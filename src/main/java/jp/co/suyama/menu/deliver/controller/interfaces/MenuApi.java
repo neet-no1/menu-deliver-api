@@ -11,6 +11,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,7 +33,7 @@ import jp.co.suyama.menu.deliver.model.auto.MenuCategoriesResponse;
 import jp.co.suyama.menu.deliver.model.auto.MenuDataResponse;
 import jp.co.suyama.menu.deliver.model.auto.MenusResponse;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-24T14:39:40.139+09:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-26T23:09:27.421+09:00")
 
 @Validated
 @Api(value = "menu", description = "the menu API")
@@ -100,13 +101,14 @@ public interface MenuApi {
     ResponseEntity<BasicResponse> postMenu(
             @ApiParam(value = "献立ID　存在しない場合は0", required = true) @RequestParam(value = "id", required = true) Integer id,
             @ApiParam(value = "献立のタイトル", required = true) @RequestParam(value = "title", required = true) String title,
+            @ApiParam(value = "カテゴリID", required = true) @RequestParam(value = "category", required = true) Integer category,
             @ApiParam(value = "内容", required = true) @RequestParam(value = "contents", required = true) String contents,
-            @ApiParam(value = "作り方", required = true) @RequestParam(value = "cookery", required = true) String cookery,
             @ApiParam(value = "投稿/保存のフラグ", required = true) @RequestParam(value = "opened", required = true) Boolean opened,
             @ApiParam(value = "献立のサブタイトル") @RequestParam(value = "subTitle", required = false) String subTitle,
             @ApiParam(value = "献立のサムネイル画像") @Valid @RequestPart(value = "thumb", required = false) MultipartFile thumb,
-            @ApiParam(value = "カテゴリID") @RequestParam(value = "category", required = false) Integer category,
+            @ApiParam(value = "作り方") @RequestParam(value = "cookery", required = false) String cookery,
             @ApiParam(value = "ファイルリスト") @RequestParam(value = "files", required = false) List<MultipartFile> files,
-            @ApiParam(value = "ファイルの説明") @RequestParam(value = "filesDescription", required = false) String filesDescription);
+            @ApiParam(value = "ファイルの説明") @RequestParam(value = "filesDescription", required = false) List<String> filesDescription,
+            Authentication authentication);
 
 }

@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Configuration;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder;
 
@@ -32,5 +34,15 @@ public class AWSConfig {
                 .withRegion(Regions.US_WEST_2).build();
 
         return client;
+    }
+
+    /**
+     * S3クライアントの生成
+     */
+    @Bean
+    public AmazonS3 amazonS3Client() {
+        AmazonS3 s3 = AmazonS3ClientBuilder.standard().withRegion(Regions.AP_NORTHEAST_1).build();
+
+        return s3;
     }
 }
