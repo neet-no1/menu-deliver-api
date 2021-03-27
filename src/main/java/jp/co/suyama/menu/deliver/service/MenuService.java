@@ -20,12 +20,16 @@ import jp.co.suyama.menu.deliver.mapper.MenuDetailsMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.MenuPicturesMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.MenusMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.UsersMapperImpl;
+import jp.co.suyama.menu.deliver.model.MenusAndPage;
+import jp.co.suyama.menu.deliver.model.auto.MenuData;
+import jp.co.suyama.menu.deliver.model.auto.PageNation;
 import jp.co.suyama.menu.deliver.model.db.MenuCategories;
 import jp.co.suyama.menu.deliver.model.db.MenuDetails;
 import jp.co.suyama.menu.deliver.model.db.MenuPictures;
 import jp.co.suyama.menu.deliver.model.db.Menus;
 import jp.co.suyama.menu.deliver.model.db.Users;
 import jp.co.suyama.menu.deliver.utils.ConvertUtils;
+import jp.co.suyama.menu.deliver.utils.PageNationUtils;
 import jp.co.suyama.menu.deliver.utils.PathUtils;
 
 @Service
@@ -240,6 +244,71 @@ public class MenuService {
         if (!deletePath.isEmpty()) {
             s3Access.deleteMenuImages(deletePath);
         }
+    }
 
+    /**
+     * お気に入り献立一覧を取得する
+     *
+     * @param email メールアドレス
+     * @param page  ページ番号
+     * @return お気に入り献立一覧
+     */
+    public MenusAndPage getFavoriteMenus(String email, int page) {
+
+        // レスポンス
+        MenusAndPage result = new MenusAndPage();
+
+        // レスポンス献立データ
+        MenuData data = null;
+        List<MenuData> menuDataList = new ArrayList<>();
+
+        // 取得件数
+        int limit = 8;
+
+        // 全体の件数を取得する
+        int count = menusMapper.countAllFavoriteMenusByEmail(email);
+
+        // ページネーションを取得
+        PageNation pageNation = PageNationUtils.createPageNation(page, count, limit);
+
+        // 取得ページからoffsetを計算する
+        int offset = (pageNation.getCurrentPage() - 1) * limit;
+
+        // メールアドレスから献立画像と献立内容以外を取得する
+        List<Menus> menusList = menusMapper.selectAllFavoriteMenusByEmail(email, limit, offset);
+
+        // 画像と内容を取得する
+        for (Menus menus : menusList) {
+            // 画像情報を取得する
+            List<MenuPictures> menuPictureList = menuPicturesMapper.selectAllByMenuId(menus.getId());
+
+            // 献立内容を取得する
+            MenuDetails contents = menuDetailsMapper.selectByMenusId(menus.getId());
+
+            // データを詰め替える
+            data = new MenuData();
+            data.setId(menus.getId());
+            data.setTitle(menus.getTitle());
+            data.setSubTitle(menus.getSubTitle());
+            data.setCategoryId(menus.getCategoryId());
+            data.setThumbPath(menus.getPath());
+            data.setContents(contents.getPath());
+            data.setOpened(menus.getOpened());
+            data.setImagePaths(menuPictureList.stream().map(p -> {
+                Map<String, String> m = new HashMap<>();
+                m.put("imageDescription", p.getDescription());
+                m.put("uploadImageUrl", p.getPath());
+                return m;
+            }).collect(Collectors.toList()));
+
+            // 献立データを追加
+            menuDataList.add(data);
+        }
+
+        // レスポンスに値を設定する
+        result.setMenuDataList(menuDataList);
+        result.setPage(pageNation);
+
+        return result;
     }
 }

@@ -18,11 +18,12 @@ public interface MenuPicturesMapperImpl extends MenuPicturesMapper {
     // @formatter:off
     @Insert({
           "insert into menu_pictures"
-        , "(menu_id, path, order_of, created_at, updated_at)"
+        , "(menu_id, path, description, order_of, created_at, updated_at)"
         , "values"
         , "("
         , "  #{menuId,jdbcType=INTEGER},"
         , "  #{path,jdbcType=VARCHAR},"
+        , "  #{description,jdbcType=VARCHAR},"
         , "  #{orderOf,jdbcType=INTEGER},"
         , "  current_timestamp,"
         , "  current_timestamp"
@@ -51,6 +52,7 @@ public interface MenuPicturesMapperImpl extends MenuPicturesMapper {
         , "  *"
         , "from menu_pictures"
         , "where menu_id = #{menuId,jdbcType=INTEGER}"
+        , "order by order_of"
     })
     // @formatter:on
     public List<MenuPictures> selectAllByMenuId(@Param("menuId") int menuId);

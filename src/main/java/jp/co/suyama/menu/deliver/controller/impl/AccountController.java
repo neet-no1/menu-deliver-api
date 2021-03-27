@@ -1,5 +1,8 @@
 package jp.co.suyama.menu.deliver.controller.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
@@ -16,6 +19,8 @@ import org.springframework.web.multipart.MultipartFile;
 import jp.co.suyama.menu.deliver.common.MenuDeliverConstants;
 import jp.co.suyama.menu.deliver.common.MenuDeliverStatus;
 import jp.co.suyama.menu.deliver.controller.interfaces.AccountApi;
+import jp.co.suyama.menu.deliver.model.ArticlesAndPage;
+import jp.co.suyama.menu.deliver.model.MenusAndPage;
 import jp.co.suyama.menu.deliver.model.auto.AccountAuthResponse;
 import jp.co.suyama.menu.deliver.model.auto.AccountData;
 import jp.co.suyama.menu.deliver.model.auto.AccountResponse;
@@ -27,22 +32,28 @@ import jp.co.suyama.menu.deliver.model.auto.MenusResponse;
 import jp.co.suyama.menu.deliver.model.auto.RegistAccountParam;
 import jp.co.suyama.menu.deliver.model.auto.UpdatePasswordParam;
 import jp.co.suyama.menu.deliver.service.AccountService;
+import jp.co.suyama.menu.deliver.service.ArticleService;
+import jp.co.suyama.menu.deliver.service.MenuService;
 import jp.co.suyama.menu.deliver.utils.ParameterCheckUtils;
 
 @RestController
 public class AccountController implements AccountApi {
 
-    /**
-     * アカウントサービス
-     */
+    // アカウントサービス
     @Autowired
-    AccountService accountService;
+    private AccountService accountService;
 
-    /**
-     * パスワードエンコーダー
-     */
+    // 献立サービス
     @Autowired
-    PasswordEncoder passwordEncoder;
+    private MenuService menuService;
+
+    // 記事サービス
+    @Autowired
+    private ArticleService articleService;
+
+    // パスワードエンコーダー
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public ResponseEntity<BasicResponse> emailConfirm(@NotNull @Valid String oneTimePassword) {
@@ -116,8 +127,56 @@ public class AccountController implements AccountApi {
     @Override
     public ResponseEntity<MenusAndArticlesResponse> getFavoriteItems(@Valid Integer menuPage,
             @Valid Integer articlePage) {
-        // TODO 自動生成されたメソッド・スタブ
-        return null;
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        // レスポンス作成
+        MenusAndArticlesResponse response = new MenusAndArticlesResponse();
+
+        // ログインチェック
+        if (MenuDeliverConstants.UNKNOWN_USER_NAME.equals(auth.getPrincipal().toString())) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("ログインされていません。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // 献立取得ページ番号存在チェック
+        if (menuPage == null) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("献立取得ページ番号が空です。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // 記事取得ページ番号存在チェック
+        if (articlePage == null) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("記事取得ページ番号が空です。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        Map<String, Object> favoriteItems = new HashMap<>();
+        // お気に入り献立を取得する
+        MenusAndPage menusAndPage = menuService.getFavoriteMenus(auth.getPrincipal().toString(), menuPage.intValue());
+        favoriteItems.put("menus", menusAndPage.getMenuDataList());
+        favoriteItems.put("menuPages", menusAndPage.getPage());
+
+        // お気に入り記事を取得する
+        ArticlesAndPage articlesAndPage = articleService.getFavoriteArticles(auth.getPrincipal().toString(),
+                articlePage.intValue());
+        favoriteItems.put("articles", articlesAndPage.getArticleDataList());
+        favoriteItems.put("articlePages", articlesAndPage.getPage());
+
+        // レスポンスに情報を設定
+        response.setCode(MenuDeliverStatus.SUCCESS);
+        response.setInfo(favoriteItems);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Override
