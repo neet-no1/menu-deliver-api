@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jp.co.suyama.menu.deliver.common.MenuDeliverConstants;
@@ -94,6 +96,9 @@ public class MenuService {
 
         // 献立内容パス
         String contentsPath = null;
+
+        // 削除画像パス
+        List<String> deletePath = new ArrayList<>();
 
         // カテゴリ存在チェック
         MenuCategories menuCategories = menuCategoriesMapper.selectByPrimaryKey(categoryId);
@@ -180,6 +185,13 @@ public class MenuService {
 
         }
 
+        // 献立画像をすべて取得する
+        deletePath = menuPicturesMapper.selectAllByMenuId(menusId).stream().map(m -> m.getPath())
+                .collect(Collectors.toList());
+
+        // 献立画像を削除する
+        menuPicturesMapper.deleteAllByMenuId(menusId);
+
         // 献立画像テーブルを登録する
         files = files == null ? new ArrayList<>() : files;
 
@@ -240,6 +252,12 @@ public class MenuService {
                 // アップロード時にエラー
                 throw new MenuDeliverException("アップロードが失敗しました。", e);
             }
+        }
+
+        // 献立画像を削除
+        if (!deletePath.isEmpty()) {
+            DeleteObjectsRequest dor = new DeleteObjectsRequest(bucket).withKeys(deletePath.toArray(new String[] {}));
+            s3.deleteObjects(dor);
         }
 
     }
