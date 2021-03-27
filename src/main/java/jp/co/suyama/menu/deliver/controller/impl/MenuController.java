@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import jp.co.suyama.menu.deliver.common.MenuDeliverConstants;
 import jp.co.suyama.menu.deliver.common.MenuDeliverStatus;
 import jp.co.suyama.menu.deliver.controller.interfaces.MenuApi;
 import jp.co.suyama.menu.deliver.model.auto.BasicResponse;
@@ -85,7 +86,7 @@ public class MenuController implements MenuApi {
         // レスポンス作成
         BasicResponse response = new BasicResponse();
 
-        if ("anonymousUser".equals(auth.getPrincipal().toString())) {
+        if (MenuDeliverConstants.UNKNOWN_USER_NAME.equals(auth.getPrincipal().toString())) {
             response.setCode(MenuDeliverStatus.FAILED);
             ErrorInfo error = new ErrorInfo();
             error.setErrorMessage("ログインされていません。");

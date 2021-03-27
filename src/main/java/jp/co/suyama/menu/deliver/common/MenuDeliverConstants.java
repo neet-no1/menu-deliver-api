@@ -9,4 +9,7 @@ public class MenuDeliverConstants {
 
     // 献立内容パス
     public static final String MENU_DETAIL_PATH = "public/menu_contents/";
+
+    // 未ログインユーザ名
+    public static final String UNKNOWN_USER_NAME = "anonymousUser";
 }

@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import jp.co.suyama.menu.deliver.common.MenuDeliverConstants;
 import jp.co.suyama.menu.deliver.common.MenuDeliverStatus;
 import jp.co.suyama.menu.deliver.controller.interfaces.AccountApi;
 import jp.co.suyama.menu.deliver.model.auto.AccountAuthResponse;
@@ -50,19 +51,17 @@ public class AccountController implements AccountApi {
 
     @Override
     public ResponseEntity<AccountAuthResponse> getAccountAuth() {
-        // TODO 自動生成されたメソッド・スタブ
+
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
+        // レスポンス作成
         AccountAuthResponse response = new AccountAuthResponse();
+
+        // ログイン状態を設定
+        response.setInfo(!MenuDeliverConstants.UNKNOWN_USER_NAME.equals(auth.getPrincipal()));
+
+        // レスポンスに情報を設定
         response.setCode(MenuDeliverStatus.SUCCESS);
-
-        System.out.println(auth.getPrincipal().toString());
-
-        if ("anonymousUser".equals(auth.getPrincipal())) {
-            response.setInfo(false);
-        } else {
-            response.setInfo(true);
-        }
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -75,7 +74,7 @@ public class AccountController implements AccountApi {
         // レスポンス作成
         AccountResponse response = new AccountResponse();
 
-        if ("anonymousUser".equals(auth.getPrincipal().toString())) {
+        if (MenuDeliverConstants.UNKNOWN_USER_NAME.equals(auth.getPrincipal().toString())) {
             response.setCode(MenuDeliverStatus.FAILED);
             ErrorInfo error = new ErrorInfo();
             error.setErrorMessage("ログインされていません。");
