@@ -1,6 +1,8 @@
 package jp.co.suyama.menu.deliver.controller.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -17,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import jp.co.suyama.menu.deliver.common.MenuDeliverConstants;
 import jp.co.suyama.menu.deliver.common.MenuDeliverStatus;
 import jp.co.suyama.menu.deliver.controller.interfaces.MenuApi;
+import jp.co.suyama.menu.deliver.model.MenusAndPage;
 import jp.co.suyama.menu.deliver.model.auto.BasicResponse;
 import jp.co.suyama.menu.deliver.model.auto.CompositionsResponse;
 import jp.co.suyama.menu.deliver.model.auto.DeleteMenuParam;
@@ -66,8 +69,20 @@ public class MenuController implements MenuApi {
 
     @Override
     public ResponseEntity<MenusResponse> getMenuNewArrival() {
-        // TODO 自動生成されたメソッド・スタブ
-        return null;
+
+        // レスポンス作成
+        MenusResponse response = new MenusResponse();
+
+        Map<String, Object> menuItems = new HashMap<>();
+        // 新着献立を検索
+        MenusAndPage menusAndPage = menuService.getMenuNewArrival();
+        menuItems.put("menus", menusAndPage.getMenuDataList());
+
+        // レスポンスに情報を設定
+        response.setCode(MenuDeliverStatus.SUCCESS);
+        response.setInfo(menuItems);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Override

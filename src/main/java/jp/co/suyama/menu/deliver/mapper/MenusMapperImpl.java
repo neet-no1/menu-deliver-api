@@ -275,4 +275,33 @@ public interface MenusMapperImpl extends MenusMapper {
     // @formatter:on
     public int countSearchMenus(@Param("keywordList") List<String> keywordList,
             @Param("categories") List<Integer> categories);
+
+    /**
+     * <pre>
+     * 新着順で献立情報を取得する
+     * </pre>
+     */
+    // @formatter:off
+    @Select({
+        "select"
+        , "  m.id,"
+        , "  m.user_id,"
+        , "  m.title,"
+        , "  m.sub_title,"
+        , "  m.path,"
+        , "  m.category_id,"
+        , "  m.opened,"
+        , "  m.created_at,"
+        , "  m.updated_at"
+        , "from menus m"
+        , "inner join users u"
+        , "  on m.user_id = u.id"
+        , "where"
+        , "  u.deleted = FALSE"
+        , "  and m.opened = TRUE"
+        , "order by m.updated_at desc"
+        , "limit #{limit,jdbcType=INTEGER}"
+    })
+    // @formatter:on
+    public List<Menus> selectAllNewArrival(@Param("limit") int limit);
 }
