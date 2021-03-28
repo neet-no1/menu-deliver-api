@@ -318,6 +318,45 @@ public class MenuService {
     }
 
     /**
+     * 献立を検索する
+     *
+     * @param keywordList 検索キーワード
+     * @param categories  検索カテゴリID
+     * @param page        取得ページ
+     * @return 献立一覧
+     */
+    public MenusAndPage searchMenus(List<String> keywordList, List<Integer> categories, int page) {
+
+        // レスポンス
+        MenusAndPage result = new MenusAndPage();
+
+        // 取得件数
+        int limit = 8;
+
+        // 全体の件数を取得する
+        int count = menusMapper.countSearchMenus(keywordList, categories);
+
+        // ページネーションを取得
+        PageNation pageNation = PageNationUtils.createPageNation(page, count, limit);
+
+        // 取得ページからoffsetを計算する
+        int offset = (pageNation.getCurrentPage() - 1) * limit;
+
+        // 検索処理
+        // カテゴリは in句
+        // キーワードは部分一致のAND
+        List<Menus> menusList = menusMapper.searchMenus(keywordList, categories, limit, offset);
+
+        List<MenuData> menuDataList = convertMenuData(menusList);
+
+        // レスポンスに値を設定する
+        result.setMenuDataList(menuDataList);
+        result.setPage(pageNation);
+
+        return result;
+    }
+
+    /**
      * 献立情報リストから関連情報を取得し、献立データリストに変換する
      *
      * @param menusList 献立情報リスト

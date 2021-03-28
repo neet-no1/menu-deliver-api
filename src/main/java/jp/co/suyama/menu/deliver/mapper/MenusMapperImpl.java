@@ -180,4 +180,99 @@ public interface MenusMapperImpl extends MenusMapper {
     })
     // @formatter:on
     public int countAllByEmail(@Param("email") String email);
+
+    /**
+     * <pre>
+     * 献立の検索をする
+     * キーワードは部分一致でAND
+     * カテゴリはIN句
+     * </pre>
+     */
+    // @formatter:off
+    @Select({
+        "<script>"
+        , "select"
+        , "  m.id,"
+        , "  m.user_id,"
+        , "  m.title,"
+        , "  m.sub_title,"
+        , "  m.path,"
+        , "  m.category_id,"
+        , "  m.opened,"
+        , "  m.created_at,"
+        , "  m.updated_at"
+        , "from menus m"
+        , "inner join users u"
+        , "  on m.user_id = u.id"
+        , "where"
+        , "  u.deleted = FALSE"
+        , "<if test='categories != null and categories.size() > 0'>"
+        , "  and m.category_id in"
+        , "  <foreach item='item' collection='categories' open='(' separator=',' close=')'>"
+        , "    #{item}"
+        , "  </foreach>"
+        , "</if>"
+        , "<if test='keywordList != null and keywordList.size() > 0'>"
+        , "  and m.id in ("
+        , "    select"
+        , "      menu_id"
+        , "    from menu_compositions mc"
+        , "    inner join compositions comp"
+        , "      on comp.item_no = mc.composition_item_no"
+        , "    where"
+        , "      <foreach item='item' collection='keywordList' separator='and'>"
+        , "        comp.name LIKE CONCAT('%', #{item}, '%')"
+        , "      </foreach>"
+        , "  )"
+        , "</if>"
+        , "order by m.updated_at desc"
+        , "limit #{limit,jdbcType=INTEGER}"
+        , "offset #{offset,jdbcType=INTEGER}"
+        , "</script>"
+    })
+    // @formatter:on
+    public List<Menus> searchMenus(@Param("keywordList") List<String> keywordList,
+            @Param("categories") List<Integer> categories, @Param("limit") int limit, @Param("offset") int offset);
+
+    /**
+     * <pre>
+     * 献立検索時の件数を取得する
+     * キーワードは部分一致でAND
+     * カテゴリはIN句
+     * </pre>
+     */
+    // @formatter:off
+    @Select({
+        "<script>"
+        , "select"
+        , "  count(m.id)"
+        , "from menus m"
+        , "inner join users u"
+        , "  on m.user_id = u.id"
+        , "where"
+        , "  u.deleted = FALSE"
+        , "<if test='categories != null and categories.size() > 0'>"
+        , "  and m.category_id in"
+        , "  <foreach item='item' collection='categories' open='(' separator=',' close=')'>"
+        , "    #{item}"
+        , "  </foreach>"
+        , "</if>"
+        , "<if test='keywordList != null and keywordList.size() > 0'>"
+        , "  and m.id in ("
+        , "    select"
+        , "      menu_id"
+        , "    from menu_compositions mc"
+        , "    inner join compositions comp"
+        , "      on comp.item_no = mc.composition_item_no"
+        , "    where"
+        , "      <foreach item='item' collection='keywordList' separator='and'>"
+        , "        comp.name LIKE CONCAT('%', #{item}, '%')"
+        , "      </foreach>"
+        , "  )"
+        , "</if>"
+        , "</script>"
+    })
+    // @formatter:on
+    public int countSearchMenus(@Param("keywordList") List<String> keywordList,
+            @Param("categories") List<Integer> categories);
 }

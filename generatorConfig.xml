@@ -34,6 +34,7 @@
 		<table tableName="answer_images" />
 		<table tableName="compositions" />
 		<table tableName="bounce" />
+		<table tableName="menu_compositions" />
 
 	</context>
 </generatorConfiguration>
