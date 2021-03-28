@@ -17,6 +17,11 @@ public class RecommendService {
     @Autowired
     private RecommendArticlesMapperImpl recommendArticlesMapper;
 
+    /**
+     * おすすめ記事情報を表示するためのパラメタを取得
+     * 
+     * @return おすすめ記事情報表示パラメタ
+     */
     public RecommendMetaData getRecommendMetaData() {
 
         // レスポンス
