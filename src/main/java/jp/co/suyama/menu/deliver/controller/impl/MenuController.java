@@ -87,8 +87,20 @@ public class MenuController implements MenuApi {
 
     @Override
     public ResponseEntity<MenusResponse> getMenuPopular() {
-        // TODO 自動生成されたメソッド・スタブ
-        return null;
+
+        // レスポンス作成
+        MenusResponse response = new MenusResponse();
+
+        Map<String, Object> menuItems = new HashMap<>();
+        // 新着献立を検索
+        MenusAndPage menusAndPage = menuService.getMenuPopular();
+        menuItems.put("menus", menusAndPage.getMenuDataList());
+
+        // レスポンスに情報を設定
+        response.setCode(MenuDeliverStatus.SUCCESS);
+        response.setInfo(menuItems);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Override

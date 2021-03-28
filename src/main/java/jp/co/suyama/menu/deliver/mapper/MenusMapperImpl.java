@@ -304,4 +304,47 @@ public interface MenusMapperImpl extends MenusMapper {
     })
     // @formatter:on
     public List<Menus> selectAllNewArrival(@Param("limit") int limit);
+
+    /**
+     * <pre>
+     * 人気順で献立情報を取得する
+     * </pre>
+     */
+    // @formatter:off
+    @Select({
+        "<script>"
+        , "select"
+        , "  m.id,"
+        , "  m.user_id,"
+        , "  m.title,"
+        , "  m.sub_title,"
+        , "  m.path,"
+        , "  m.category_id,"
+        , "  m.opened,"
+        , "  m.created_at,"
+        , "  m.updated_at"
+        , "from menus m"
+        , "inner join users u"
+        , "  on m.user_id = u.id"
+        , "inner join ("
+        , "  select"
+        , "    menu_id,"
+        , "    SUM(count)"
+        , "  from menu_views"
+        , "  where"
+        , "<![CDATA["
+        , "    date <= (to_date('20180101', 'YYYYMMDD') - interval '1 month')"
+        , "]]>"
+        , "  group by menu_id"
+        , ") as view"
+        , "  on view.menu_id = m.id"
+        , "where"
+        , "  u.deleted = FALSE"
+        , "  and m.opened = TRUE"
+        , "order by m.updated_at desc"
+        , "limit #{limit,jdbcType=INTEGER}"
+        , "</script>"
+    })
+    // @formatter:on
+    public List<Menus> selectAllPopular(@Param("limit") int limit);
 }

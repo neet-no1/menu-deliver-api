@@ -401,7 +401,7 @@ public class MenuService {
     /**
      * 新着献立を取得する
      *
-     * @return お気に入り献立一覧
+     * @return 新着献立一覧
      */
     public MenusAndPage getMenuNewArrival() {
 
@@ -413,6 +413,30 @@ public class MenuService {
 
         // 献立画像と献立内容以外を取得する
         List<Menus> menusList = menusMapper.selectAllNewArrival(limit);
+
+        List<MenuData> menuDataList = convertMenuData(menusList);
+
+        // レスポンスに値を設定する
+        result.setMenuDataList(menuDataList);
+
+        return result;
+    }
+
+    /**
+     * 人気献立を取得する
+     *
+     * @return 人気献立一覧
+     */
+    public MenusAndPage getMenuPopular() {
+
+        // レスポンス
+        MenusAndPage result = new MenusAndPage();
+
+        // 取得件数
+        int limit = 8;
+
+        // 献立画像と献立内容以外を取得する
+        List<Menus> menusList = menusMapper.selectAllPopular(limit);
 
         List<MenuData> menuDataList = convertMenuData(menusList);
 
