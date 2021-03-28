@@ -157,7 +157,7 @@ public class AccountService {
 
         AccountData data = new AccountData();
         data.setId(user.getId());
-        data.setImgPath(user.getIcon());
+        data.setImgPath(PathUtils.getUserIconPath(user.getIcon()));
         data.setName(user.getName());
         data.setEmail(user.getEmail());
 
