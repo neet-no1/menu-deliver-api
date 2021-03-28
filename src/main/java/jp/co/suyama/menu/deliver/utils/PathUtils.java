@@ -92,6 +92,20 @@ public class PathUtils {
         return MenuDeliverConstants.ARTICLE_DETAIL_PATH + path;
     }
 
+    /**
+     * おすすめ記事画像のパスを取得する
+     */
+    public static String getRecommendImagePath(String path) {
+        return MenuDeliverConstants.RECOMMEND_IMAGE_PATH + path;
+    }
+
+    /**
+     * おすすめ記事画像のパスを取得する
+     */
+    public static String getRecommendDetailsPath(String path) {
+        return MenuDeliverConstants.RECOMMEND_DETAIL_PATH + path;
+    }
+
     private static String encodeUrl(String param) {
         URLCodec codec = new URLCodec("UTF-8");
         try {

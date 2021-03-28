@@ -19,6 +19,12 @@ public class MenuDeliverConstants {
     // 記事内容パス
     public static final String ARTICLE_DETAIL_PATH = "public/article_contents/";
 
+    // おすすめ記事画像パス
+    public static final String RECOMMEND_IMAGE_PATH = "public/recommend_images/";
+
+    // おすすめ記事内容パス
+    public static final String RECOMMEND_DETAIL_PATH = "public/recommend_contents/";
+
     // 未ログインユーザ名
     public static final String UNKNOWN_USER_NAME = "anonymousUser";
 
