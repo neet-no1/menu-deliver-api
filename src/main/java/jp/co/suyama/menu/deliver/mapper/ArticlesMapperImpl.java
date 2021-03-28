@@ -186,4 +186,30 @@ public interface ArticlesMapperImpl extends ArticlesMapper {
     })
     // @formatter:on
     public int countSearchArticles(@Param("keywordList") List<String> keywordList);
+
+    /**
+     * <pre>
+     * 新着順で記事情報を取得する
+     * </pre>
+     */
+    // @formatter:off
+    @Select({
+      "select"
+      , "  a.id,"
+      , "  a.user_id,"
+      , "  a.title,"
+      , "  a.start_sentence,"
+      , "  a.path,"
+      , "  a.opened,"
+      , "  a.created_at,"
+      , "  a.updated_at"
+      , "from articles a"
+      , "inner join users u"
+      , "  on a.user_id = u.id"
+      , "where"
+      , "  u.deleted = FALSE"
+      , "  and a.opened = TRUE"
+    })
+    // @formatter:on
+    public List<Articles> selectAllNewArrival(@Param("limit") int limit);
 }

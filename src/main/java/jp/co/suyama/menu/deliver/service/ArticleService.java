@@ -145,6 +145,30 @@ public class ArticleService {
     }
 
     /**
+     * 新着記事を取得する
+     *
+     * @return 新着記事一覧
+     */
+    public ArticlesAndPage getArticleNewArrival() {
+
+        // レスポンス
+        ArticlesAndPage result = new ArticlesAndPage();
+
+        // 取得件数
+        int limit = 8;
+
+        // 記事内容以外を取得する
+        List<Articles> articlesList = articlesMapper.selectAllNewArrival(limit);
+
+        List<ArticleData> articleDataList = convertArticleData(articlesList);
+
+        // レスポンスに値を設定する
+        result.setArticleDataList(articleDataList);
+
+        return result;
+    }
+
+    /**
      * 記事情報リストから関連情報を取得し、記事データリストに変換する
      *
      * @param articlesList 記事情報リスト
