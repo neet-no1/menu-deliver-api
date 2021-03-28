@@ -258,10 +258,6 @@ public class MenuService {
         // レスポンス
         MenusAndPage result = new MenusAndPage();
 
-        // レスポンス献立データ
-        MenuData data = null;
-        List<MenuData> menuDataList = new ArrayList<>();
-
         // 取得件数
         int limit = 8;
 
@@ -277,6 +273,61 @@ public class MenuService {
         // メールアドレスから献立画像と献立内容以外を取得する
         List<Menus> menusList = menusMapper.selectAllFavoriteMenusByEmail(email, limit, offset);
 
+        List<MenuData> menuDataList = convertMenuData(menusList);
+
+        // レスポンスに値を設定する
+        result.setMenuDataList(menuDataList);
+        result.setPage(pageNation);
+
+        return result;
+    }
+
+    /**
+     * 投稿献立一覧を取得する
+     *
+     * @param email メールアドレス
+     * @param page  ページ番号
+     * @return 投稿献立一覧
+     */
+    public MenusAndPage getPostedMenu(String email, int page) {
+        // レスポンス
+        MenusAndPage result = new MenusAndPage();
+
+        // 取得件数
+        int limit = 8;
+
+        // 全体の件数を取得する
+        int count = menusMapper.countAllByEmail(email);
+
+        // ページネーションを取得
+        PageNation pageNation = PageNationUtils.createPageNation(page, count, limit);
+
+        // 取得ページからoffsetを計算する
+        int offset = (pageNation.getCurrentPage() - 1) * limit;
+
+        // メールアドレスから献立画像と献立内容以外を取得する
+        List<Menus> menusList = menusMapper.selectAllByEmail(email, limit, offset);
+
+        List<MenuData> menuDataList = convertMenuData(menusList);
+
+        // レスポンスに値を設定する
+        result.setMenuDataList(menuDataList);
+        result.setPage(pageNation);
+
+        return result;
+    }
+
+    /**
+     * 献立情報リストから関連情報を取得し、献立データリストに変換する
+     *
+     * @param menusList 献立情報リスト
+     * @return 献立データリスト
+     */
+    private List<MenuData> convertMenuData(List<Menus> menusList) {
+        // レスポンス献立データ
+        MenuData data = null;
+        List<MenuData> menuDataList = new ArrayList<>();
+
         // 画像と内容を取得する
         for (Menus menus : menusList) {
             // 画像情報を取得する
@@ -291,13 +342,13 @@ public class MenuService {
             data.setTitle(menus.getTitle());
             data.setSubTitle(menus.getSubTitle());
             data.setCategoryId(menus.getCategoryId());
-            data.setThumbPath(menus.getPath());
-            data.setContents(contents.getPath());
+            data.setThumbPath(PathUtils.getMenuImagePath(menus.getPath()));
+            data.setContents(PathUtils.getMenuDetailsPath(contents.getPath()));
             data.setOpened(menus.getOpened());
             data.setImagePaths(menuPictureList.stream().map(p -> {
                 Map<String, String> m = new HashMap<>();
                 m.put("imageDescription", p.getDescription());
-                m.put("uploadImageUrl", p.getPath());
+                m.put("uploadImageUrl", PathUtils.getMenuImagePath(p.getPath()));
                 return m;
             }).collect(Collectors.toList()));
 
@@ -305,10 +356,6 @@ public class MenuService {
             menuDataList.add(data);
         }
 
-        // レスポンスに値を設定する
-        result.setMenuDataList(menuDataList);
-        result.setPage(pageNation);
-
-        return result;
+        return menuDataList;
     }
 }

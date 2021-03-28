@@ -9,6 +9,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.net.URLCodec;
 
+import jp.co.suyama.menu.deliver.common.MenuDeliverConstants;
 import jp.co.suyama.menu.deliver.exception.MenuDeliverException;
 
 public class PathUtils {
@@ -40,6 +41,55 @@ public class PathUtils {
      */
     public static String createUserIconPath(int userId, String email) {
         return userId + "_" + encodeUrl(encrypt(email));
+    }
+
+    /**
+     * 記事画像のパスを生成する
+     */
+    public static String createArticleImagePath(int articleId, String fileName) {
+        return articleId + "_" + encodeUrl(encrypt(fileName));
+    }
+
+    /**
+     * 記事詳細のパスを生成する
+     */
+    public static String createArticleDetailsPath(String email, int articleId) {
+        return articleId + "_" + encodeUrl(encrypt(email));
+    }
+
+    /**
+     * 献立詳細のパスを取得する
+     */
+    public static String getMenuDetailsPath(String path) {
+        return MenuDeliverConstants.MENU_DETAIL_PATH + path;
+    }
+
+    /**
+     * 献立画像のパスを取得する
+     */
+    public static String getMenuImagePath(String path) {
+        return MenuDeliverConstants.MENU_IMAGE_PATH + path;
+    }
+
+    /**
+     * ユーザアイコンのパスを取得する
+     */
+    public static String getUserIconPath(String path) {
+        return MenuDeliverConstants.USER_ICON_PATH + path;
+    }
+
+    /**
+     * 記事画像のパスを取得する
+     */
+    public static String getArticleImagePath(String path) {
+        return MenuDeliverConstants.ARTICLE_IMAGE_PATH + path;
+    }
+
+    /**
+     * 記事詳細のパスを取得する
+     */
+    public static String getArticleDetailsPath(String path) {
+        return MenuDeliverConstants.ARTICLE_DETAIL_PATH + path;
     }
 
     private static String encodeUrl(String param) {

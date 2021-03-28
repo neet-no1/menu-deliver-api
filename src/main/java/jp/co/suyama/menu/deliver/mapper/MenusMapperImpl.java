@@ -127,4 +127,57 @@ public interface MenusMapperImpl extends MenusMapper {
     // @formatter:on
     public int countAllFavoriteMenusByEmail(@Param("email") String email);
 
+    /**
+     * <pre>
+     * メールアドレスを元に投稿献立一覧を取得する
+     * ユーザが削除されていない
+     * ものを取得
+     * </pre>
+     */
+    // @formatter:off
+    @Select({
+          "select"
+        , "  m.id,"
+        , "  m.user_id,"
+        , "  m.title,"
+        , "  m.sub_title,"
+        , "  m.path,"
+        , "  m.category_id,"
+        , "  m.opened,"
+        , "  m.created_at,"
+        , "  m.updated_at"
+        , "from menus m"
+        , "inner join users u"
+        , "  on m.user_id = u.id"
+        , "where"
+        , "  u.deleted = FALSE"
+        , "  and u.email = #{email,jdbcType=VARCHAR}"
+        , "order by m.id desc"
+        , "limit #{limit,jdbcType=INTEGER}"
+        , "offset #{offset,jdbcType=INTEGER}"
+    })
+    // @formatter:on
+    public List<Menus> selectAllByEmail(@Param("email") String email, @Param("limit") int limit,
+            @Param("offset") int offset);
+
+    /**
+     * <pre>
+     * メールアドレスを元に投稿献立一覧を取得するときの件数
+     * ユーザが削除されていない
+     * ものの件数を取得
+     * </pre>
+     */
+    // @formatter:off
+    @Select({
+          "select"
+        , "  count(m.id)"
+        , "from menus m"
+        , "inner join users u"
+        , "  on m.user_id = u.id"
+        , "where"
+        , "  u.deleted = FALSE"
+        , "  and u.email = #{email,jdbcType=VARCHAR}"
+    })
+    // @formatter:on
+    public int countAllByEmail(@Param("email") String email);
 }

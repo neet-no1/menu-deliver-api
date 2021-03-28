@@ -13,6 +13,12 @@ public class MenuDeliverConstants {
     // ユーザアイコンパス
     public static final String USER_ICON_PATH = "public/user_images/";
 
+    // 記事画像パス
+    public static final String ARTICLE_IMAGE_PATH = "public/article_images/";
+
+    // 記事内容パス
+    public static final String ARTICLE_DETAIL_PATH = "public/article_contents/";
+
     // 未ログインユーザ名
     public static final String UNKNOWN_USER_NAME = "anonymousUser";
 

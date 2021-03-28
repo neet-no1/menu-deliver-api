@@ -187,8 +187,41 @@ public class AccountController implements AccountApi {
 
     @Override
     public ResponseEntity<MenusResponse> getPostedMenus(@Valid Integer page) {
-        // TODO 自動生成されたメソッド・スタブ
-        return null;
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        // レスポンス作成
+        MenusResponse response = new MenusResponse();
+
+        // ログインチェック
+        if (MenuDeliverConstants.UNKNOWN_USER_NAME.equals(auth.getPrincipal().toString())) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("ログインされていません。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // 取得ページ番号存在チェック
+        if (page == null) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("取得ページ番号が空です。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        Map<String, Object> menuItems = new HashMap<>();
+        // お気に入り献立を取得する
+        MenusAndPage menusAndPage = menuService.getFavoriteMenus(auth.getPrincipal().toString(), page.intValue());
+        menuItems.put("menus", menusAndPage.getMenuDataList());
+        menuItems.put("page", menusAndPage.getPage());
+
+        // レスポンスに情報を設定
+        response.setCode(MenuDeliverStatus.SUCCESS);
+        response.setInfo(menuItems);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Override
