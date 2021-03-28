@@ -181,8 +181,42 @@ public class AccountController implements AccountApi {
 
     @Override
     public ResponseEntity<ArticlesResponse> getPostedArticles(@Valid Integer page) {
-        // TODO 自動生成されたメソッド・スタブ
-        return null;
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        // レスポンス作成
+        ArticlesResponse response = new ArticlesResponse();
+
+        // ログインチェック
+        if (MenuDeliverConstants.UNKNOWN_USER_NAME.equals(auth.getPrincipal().toString())) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("ログインされていません。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // 取得ページ番号存在チェック
+        if (page == null) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("取得ページ番号が空です。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        Map<String, Object> articleItems = new HashMap<>();
+        // お気に入り献立を取得する
+        ArticlesAndPage articlesAndPage = articleService.getPostedArticle(auth.getPrincipal().toString(),
+                page.intValue());
+        articleItems.put("articles", articlesAndPage.getArticleDataList());
+        articleItems.put("page", articlesAndPage.getPage());
+
+        // レスポンスに情報を設定
+        response.setCode(MenuDeliverStatus.SUCCESS);
+        response.setInfo(articleItems);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Override
@@ -213,7 +247,7 @@ public class AccountController implements AccountApi {
 
         Map<String, Object> menuItems = new HashMap<>();
         // お気に入り献立を取得する
-        MenusAndPage menusAndPage = menuService.getFavoriteMenus(auth.getPrincipal().toString(), page.intValue());
+        MenusAndPage menusAndPage = menuService.getPostedMenu(auth.getPrincipal().toString(), page.intValue());
         menuItems.put("menus", menusAndPage.getMenuDataList());
         menuItems.put("page", menusAndPage.getPage());
 

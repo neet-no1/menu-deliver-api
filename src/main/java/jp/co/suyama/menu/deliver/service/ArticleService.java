@@ -18,6 +18,7 @@ import jp.co.suyama.menu.deliver.model.db.ArticleDetails;
 import jp.co.suyama.menu.deliver.model.db.Articles;
 import jp.co.suyama.menu.deliver.model.db.Users;
 import jp.co.suyama.menu.deliver.utils.PageNationUtils;
+import jp.co.suyama.menu.deliver.utils.PathUtils;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -47,10 +48,6 @@ public class ArticleService {
         // レスポンス
         ArticlesAndPage result = new ArticlesAndPage();
 
-        // レスポンス記事データ
-        ArticleData data = null;
-        List<ArticleData> articleDataList = new ArrayList<>();
-
         // 取得件数
         int limit = 4;
 
@@ -65,6 +62,63 @@ public class ArticleService {
 
         // メールアドレスから記事内容以外を取得する
         List<Articles> articlesList = articlesMapper.selectAllFavoriteArticlesByEmail(email, limit, offset);
+
+        List<ArticleData> articleDataList = convertArticleData(articlesList, email);
+
+        // レスポンスに値を設定する
+        result.setArticleDataList(articleDataList);
+        result.setPage(pageNation);
+
+        return result;
+    }
+
+    /**
+     * 投稿記事一覧を取得する
+     *
+     * @param email メールアドレス
+     * @param page  ページ番号
+     * @return 投稿記事一覧
+     */
+    public ArticlesAndPage getPostedArticle(String email, int page) {
+
+        // レスポンス
+        ArticlesAndPage result = new ArticlesAndPage();
+
+        // 取得件数
+        int limit = 4;
+
+        // 全体の件数を取得する
+        int count = articlesMapper.countAllByEmail(email);
+
+        // ページネーションを取得
+        PageNation pageNation = PageNationUtils.createPageNation(page, count, limit);
+
+        // 取得ページからoffsetを計算する
+        int offset = (pageNation.getCurrentPage() - 1) * limit;
+
+        // メールアドレスから記事内容以外を取得する
+        List<Articles> articlesList = articlesMapper.selectAllByEmail(email, limit, offset);
+
+        List<ArticleData> articleDataList = convertArticleData(articlesList, email);
+
+        // レスポンスに値を設定する
+        result.setArticleDataList(articleDataList);
+        result.setPage(pageNation);
+
+        return result;
+    }
+
+    /**
+     * 記事情報リストから関連情報を取得し、記事データリストに変換する
+     *
+     * @param articlesList 記事情報リスト
+     * @return 記事データリスト
+     */
+    private List<ArticleData> convertArticleData(List<Articles> articlesList, String email) {
+
+        // レスポンス記事データ
+        ArticleData data = null;
+        List<ArticleData> articleDataList = new ArrayList<>();
 
         // ユーザ情報を取得する
         Users user = usersMapper.selectEmail(email);
@@ -81,22 +135,18 @@ public class ArticleService {
             data.setId(articles.getId());
             data.setTitle(articles.getTitle());
             data.setDetail(articles.getStartSentence());
-            data.setImgPath(articles.getPath());
+            data.setImgPath(PathUtils.getArticleImagePath(articles.getPath()));
             data.setDate(df.format(articles.getUpdatedAt()));
             data.setUserId(user.getId());
             data.setUserName(user.getName());
-            data.setUserIconPath(user.getIcon());
-            data.setContents(contents.getPath());
+            data.setUserIconPath(PathUtils.getUserIconPath(user.getIcon()));
+            data.setContents(PathUtils.getArticleDetailsPath(contents.getPath()));
             data.setOpened(articles.getOpened());
 
             // 記事データを追加
             articleDataList.add(data);
         }
 
-        // レスポンスに値を設定する
-        result.setArticleDataList(articleDataList);
-        result.setPage(pageNation);
-
-        return result;
+        return articleDataList;
     }
 }

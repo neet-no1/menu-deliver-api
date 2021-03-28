@@ -70,4 +70,57 @@ public interface ArticlesMapperImpl extends ArticlesMapper {
     })
     // @formatter:on
     public int countAllFavoriteArticlesByEmail(@Param("email") String email);
+
+    /**
+     * <pre>
+     * メールアドレスを元に投稿記事一覧を取得する
+     * ユーザが削除されていない
+     * ものを取得
+     * </pre>
+     */
+    // @formatter:off
+    @Select({
+          "select"
+        , "  a.id,"
+        , "  a.user_id,"
+        , "  a.title,"
+        , "  a.start_sentence,"
+        , "  a.path,"
+        , "  a.opened,"
+        , "  a.created_at,"
+        , "  a.updated_at"
+        , "from articles a"
+        , "inner join users u"
+        , "  on a.user_id = u.id"
+        , "where"
+        , "  u.deleted = FALSE"
+        , "  and u.email = #{email,jdbcType=VARCHAR}"
+        , "order by a.id desc"
+        , "limit #{limit,jdbcType=INTEGER}"
+        , "offset #{offset,jdbcType=INTEGER}"
+    })
+    // @formatter:on
+    public List<Articles> selectAllByEmail(@Param("email") String email, @Param("limit") int limit,
+            @Param("offset") int offset);
+
+    /**
+     * <pre>
+     * メールアドレスを元に投稿記事一覧を取得するときの件数
+     * ユーザが削除されていない
+     * ものの件数を取得
+     * </pre>
+     */
+    // @formatter:off
+    @Select({
+          "select"
+        , "  count(a.id)"
+        , "from articles a"
+        , "inner join users u"
+        , "  on a.user_id = u.id"
+        , "where"
+        , "  u.deleted = FALSE"
+        , "  and u.email = #{email,jdbcType=VARCHAR}"
+    })
+    // @formatter:on
+    public int countAllByEmail(@Param("email") String email);
 }
