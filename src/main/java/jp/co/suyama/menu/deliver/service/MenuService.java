@@ -2,6 +2,7 @@ package jp.co.suyama.menu.deliver.service;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,17 +14,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import jp.co.suyama.menu.deliver.common.S3Access;
 import jp.co.suyama.menu.deliver.exception.MenuDeliverException;
 import jp.co.suyama.menu.deliver.mapper.MenuCategoriesMapperImpl;
+import jp.co.suyama.menu.deliver.mapper.MenuCompositionsMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.MenuDetailsMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.MenuPicturesMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.MenusMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.UsersMapperImpl;
+import jp.co.suyama.menu.deliver.model.MenuComposition;
 import jp.co.suyama.menu.deliver.model.MenusAndPage;
 import jp.co.suyama.menu.deliver.model.auto.MenuData;
 import jp.co.suyama.menu.deliver.model.auto.PageNation;
 import jp.co.suyama.menu.deliver.model.db.MenuCategories;
+import jp.co.suyama.menu.deliver.model.db.MenuCompositions;
 import jp.co.suyama.menu.deliver.model.db.MenuDetails;
 import jp.co.suyama.menu.deliver.model.db.MenuPictures;
 import jp.co.suyama.menu.deliver.model.db.Menus;
@@ -40,6 +46,10 @@ public class MenuService {
     @Autowired
     private S3Access s3Access;
 
+    // オブジェクトマッパー
+    @Autowired
+    private ObjectMapper objectMapper;
+
     // 献立テーブル
     @Autowired
     private MenusMapperImpl menusMapper;
@@ -55,6 +65,10 @@ public class MenuService {
     // 献立カテゴリテーブル
     @Autowired
     private MenuCategoriesMapperImpl menuCategoriesMapper;
+
+    // 献立素材テーブル
+    @Autowired
+    private MenuCompositionsMapperImpl menuCompositionsMapper;
 
     // ユーザテーブル
     @Autowired
@@ -176,6 +190,34 @@ public class MenuService {
             menuDetailsMapper.updateMenuDetails(menuDetails);
 
         }
+
+        // 献立素材を削除する
+        menuCompositionsMapper.deleteAllByMenuId(menusId);
+
+        // 献立素材を登録する
+        MenuComposition[] menuCompArray = null;
+        try {
+            // 献立内容をオブジェクトに変換する
+            menuCompArray = objectMapper.readValue(contents, MenuComposition[].class);
+        } catch (Exception e) {
+            throw new MenuDeliverException("献立内容の変換に失敗しました。");
+        }
+
+        // 重複しない食品番号のリストを取得する
+        List<Integer> compositionIdList = new ArrayList<>(
+                Arrays.asList(menuCompArray).stream().map(mc -> mc.getCompId()).collect(Collectors.toSet()));
+
+        // 登録用のオブジェクトを生成
+        final int compMenusId = menusId;
+        List<MenuCompositions> menuCompositionsList = compositionIdList.stream().map(c -> {
+            MenuCompositions m = new MenuCompositions();
+            m.setMenuId(compMenusId);
+            m.setCompositionItemNo(c);
+            return m;
+        }).collect(Collectors.toList());
+
+        // 登録
+        menuCompositionsMapper.registMenuCompositions(menuCompositionsList);
 
         // 献立画像をすべて取得する
         deletePath = menuPicturesMapper.selectAllByMenuId(menusId).stream().map(m -> m.getPath())
