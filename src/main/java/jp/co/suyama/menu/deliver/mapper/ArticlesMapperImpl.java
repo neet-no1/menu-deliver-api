@@ -123,4 +123,67 @@ public interface ArticlesMapperImpl extends ArticlesMapper {
     })
     // @formatter:on
     public int countAllByEmail(@Param("email") String email);
+
+    /**
+     * <pre>
+     * 記事の検索をする
+     * キーワードは部分一致でAND
+     * </pre>
+     */
+    // @formatter:off
+    @Select({
+      "<script>"
+      , "select"
+      , "  a.id,"
+      , "  a.user_id,"
+      , "  a.title,"
+      , "  a.start_sentence,"
+      , "  a.path,"
+      , "  a.opened,"
+      , "  a.created_at,"
+      , "  a.updated_at"
+      , "from articles a"
+      , "inner join users u"
+      , "  on a.user_id = u.id"
+      , "where"
+      , "  u.deleted = FALSE"
+      , "<if test='keywordList != null and keywordList.size() > 0'>"
+      , "  <foreach item='item' collection='keywordList'>"
+      , "  and a.title LIKE CONCAT('%', #{item}, '%')"
+      , "  </foreach>"
+      , "</if>"
+      , "order by a.id desc"
+      , "limit #{limit,jdbcType=INTEGER}"
+      , "offset #{offset,jdbcType=INTEGER}"
+      , "</script>"
+    })
+    // @formatter:on
+    public List<Articles> searchArticles(@Param("keywordList") List<String> keywordList, @Param("limit") int limit,
+            @Param("offset") int offset);
+
+    /**
+     * <pre>
+     * 記事検索時の件数を取得する
+     * キーワードは部分一致でAND
+     * </pre>
+     */
+    // @formatter:off
+    @Select({
+      "<script>"
+      , "select"
+      , "  count(a.id)"
+      , "from articles a"
+      , "inner join users u"
+      , "  on a.user_id = u.id"
+      , "where"
+      , "  u.deleted = FALSE"
+      , "<if test='keywordList != null and keywordList.size() > 0'>"
+      , "  <foreach item='item' collection='keywordList'>"
+      , "  and a.title LIKE CONCAT('%', #{item}, '%')"
+      , "  </foreach>"
+      , "</if>"
+      , "</script>"
+    })
+    // @formatter:on
+    public int countSearchArticles(@Param("keywordList") List<String> keywordList);
 }

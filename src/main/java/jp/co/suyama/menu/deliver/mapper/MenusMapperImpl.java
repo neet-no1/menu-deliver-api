@@ -94,7 +94,7 @@ public interface MenusMapperImpl extends MenusMapper {
         , "  u.deleted = FALSE"
         , "  and m.opened = TRUE"
         , "  and u.email = #{email,jdbcType=VARCHAR}"
-        , "order by f.id asc"
+        , "order by f.id desc"
         , "limit #{limit,jdbcType=INTEGER}"
         , "offset #{offset,jdbcType=INTEGER}"
     })

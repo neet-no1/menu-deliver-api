@@ -63,7 +63,7 @@ public class ArticleService {
         // メールアドレスから記事内容以外を取得する
         List<Articles> articlesList = articlesMapper.selectAllFavoriteArticlesByEmail(email, limit, offset);
 
-        List<ArticleData> articleDataList = convertArticleData(articlesList, email);
+        List<ArticleData> articleDataList = convertArticleData(articlesList);
 
         // レスポンスに値を設定する
         result.setArticleDataList(articleDataList);
@@ -99,7 +99,43 @@ public class ArticleService {
         // メールアドレスから記事内容以外を取得する
         List<Articles> articlesList = articlesMapper.selectAllByEmail(email, limit, offset);
 
-        List<ArticleData> articleDataList = convertArticleData(articlesList, email);
+        List<ArticleData> articleDataList = convertArticleData(articlesList);
+
+        // レスポンスに値を設定する
+        result.setArticleDataList(articleDataList);
+        result.setPage(pageNation);
+
+        return result;
+    }
+
+    /**
+     * 記事を検索する
+     *
+     * @param keywordList 検索キーワード
+     * @param page        取得ページ
+     * @return 記事一覧
+     */
+    public ArticlesAndPage searchArticles(List<String> keywordList, int page) {
+
+        // レスポンス
+        ArticlesAndPage result = new ArticlesAndPage();
+
+        // 取得件数
+        int limit = 4;
+
+        // 全体の件数を取得する
+        int count = articlesMapper.countSearchArticles(keywordList);
+
+        // ページネーションを取得
+        PageNation pageNation = PageNationUtils.createPageNation(page, count, limit);
+
+        // 取得ページからoffsetを計算する
+        int offset = (pageNation.getCurrentPage() - 1) * limit;
+
+        // メールアドレスから記事内容以外を取得する
+        List<Articles> articlesList = articlesMapper.searchArticles(keywordList, limit, offset);
+
+        List<ArticleData> articleDataList = convertArticleData(articlesList);
 
         // レスポンスに値を設定する
         result.setArticleDataList(articleDataList);
@@ -114,17 +150,17 @@ public class ArticleService {
      * @param articlesList 記事情報リスト
      * @return 記事データリスト
      */
-    private List<ArticleData> convertArticleData(List<Articles> articlesList, String email) {
+    private List<ArticleData> convertArticleData(List<Articles> articlesList) {
 
         // レスポンス記事データ
         ArticleData data = null;
         List<ArticleData> articleDataList = new ArrayList<>();
 
-        // ユーザ情報を取得する
-        Users user = usersMapper.selectEmail(email);
-
         // 内容を取得する
         for (Articles articles : articlesList) {
+
+            // ユーザ情報を取得する
+            Users user = usersMapper.selectByPrimaryKey(articles.getUserId());
 
             // 記事内容を取得する
             ArticleDetails contents = articleDetailsMapper.selectByArticlesId(articles.getId());
