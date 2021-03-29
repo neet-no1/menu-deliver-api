@@ -323,7 +323,7 @@ public class MenuService {
         // メールアドレスから献立画像と献立内容以外を取得する
         List<Menus> menusList = menusMapper.selectAllFavoriteMenusByEmail(email, limit, offset);
 
-        List<MenuData> menuDataList = convertMenuData(menusList);
+        List<MenuData> menuDataList = convertMenuDataList(null, menusList);
 
         // レスポンスに値を設定する
         result.setMenuDataList(menuDataList);
@@ -358,7 +358,7 @@ public class MenuService {
         // メールアドレスから献立画像と献立内容以外を取得する
         List<Menus> menusList = menusMapper.selectAllByEmail(email, limit, offset);
 
-        List<MenuData> menuDataList = convertMenuData(menusList);
+        List<MenuData> menuDataList = convertMenuDataList(null, menusList);
 
         // レスポンスに値を設定する
         result.setMenuDataList(menuDataList);
@@ -397,7 +397,7 @@ public class MenuService {
         // キーワードは部分一致のAND
         List<Menus> menusList = menusMapper.searchMenus(keywordList, categories, limit, offset);
 
-        List<MenuData> menuDataList = convertMenuData(menusList);
+        List<MenuData> menuDataList = convertMenuDataList(null, menusList);
 
         // レスポンスに値を設定する
         result.setMenuDataList(menuDataList);
@@ -422,7 +422,7 @@ public class MenuService {
         // 献立画像と献立内容以外を取得する
         List<Menus> menusList = menusMapper.selectAllNewArrival(limit);
 
-        List<MenuData> menuDataList = convertMenuData(menusList);
+        List<MenuData> menuDataList = convertMenuDataList(null, menusList);
 
         // レスポンスに値を設定する
         result.setMenuDataList(menuDataList);
@@ -446,7 +446,7 @@ public class MenuService {
         // 献立画像と献立内容以外を取得する
         List<Menus> menusList = menusMapper.selectAllPopular(limit);
 
-        List<MenuData> menuDataList = convertMenuData(menusList);
+        List<MenuData> menuDataList = convertMenuDataList(null, menusList);
 
         // レスポンスに値を設定する
         result.setMenuDataList(menuDataList);
@@ -517,44 +517,83 @@ public class MenuService {
     }
 
     /**
+     * 献立内容を取得する
+     *
+     * @param email メールアドレス
+     * @param id    献立ID
+     * @return 献立内容
+     */
+    public MenuData getMenu(String email, int id) {
+
+        // ユーザ情報取得
+        Integer userId = null;
+        Users user = usersMapper.selectEmail(email);
+
+        // 存在する場合、ユーザIDを設定
+        if (user != null) {
+            userId = user.getId();
+        }
+
+        // 献立情報を取得する
+        Menus menu = menusMapper.selectByPrimaryKey(id);
+
+        // 詰め替えする
+        return convertMenuData(userId, menu);
+    }
+
+    /**
      * 献立情報リストから関連情報を取得し、献立データリストに変換する
      *
+     * @param userId    ユーザID(自分の投稿かを判断する)
      * @param menusList 献立情報リスト
      * @return 献立データリスト
      */
-    private List<MenuData> convertMenuData(List<Menus> menusList) {
+    private List<MenuData> convertMenuDataList(Integer userId, List<Menus> menusList) {
+
         // レスポンス献立データ
-        MenuData data = null;
         List<MenuData> menuDataList = new ArrayList<>();
 
         // 画像と内容を取得する
         for (Menus menus : menusList) {
-            // 画像情報を取得する
-            List<MenuPictures> menuPictureList = menuPicturesMapper.selectAllByMenuId(menus.getId());
-
-            // 献立内容を取得する
-            MenuDetails contents = menuDetailsMapper.selectByMenusId(menus.getId());
-
-            // データを詰め替える
-            data = new MenuData();
-            data.setId(menus.getId());
-            data.setTitle(menus.getTitle());
-            data.setSubTitle(menus.getSubTitle());
-            data.setCategoryId(menus.getCategoryId());
-            data.setThumbPath(PathUtils.getMenuImagePath(menus.getPath()));
-            data.setContents(PathUtils.getMenuDetailsPath(contents.getPath()));
-            data.setOpened(menus.getOpened());
-            data.setImagePaths(menuPictureList.stream().map(p -> {
-                Map<String, String> m = new HashMap<>();
-                m.put("imageDescription", p.getDescription());
-                m.put("uploadImageUrl", PathUtils.getMenuImagePath(p.getPath()));
-                return m;
-            }).collect(Collectors.toList()));
-
             // 献立データを追加
-            menuDataList.add(data);
+            menuDataList.add(convertMenuData(userId, menus));
         }
 
         return menuDataList;
+    }
+
+    /**
+     * 献立情報から関連情報を取得し、献立データに変換する
+     *
+     * @param userId    ユーザID(自分の投稿かを判断する)
+     * @param menusList 献立情報
+     * @return 献立データ
+     */
+    private MenuData convertMenuData(Integer userId, Menus menus) {
+
+        // 画像情報を取得する
+        List<MenuPictures> menuPictureList = menuPicturesMapper.selectAllByMenuId(menus.getId());
+
+        // 献立内容を取得する
+        MenuDetails contents = menuDetailsMapper.selectByMenusId(menus.getId());
+
+        // データを詰め替える
+        MenuData data = new MenuData();
+        data.setId(menus.getId());
+        data.setTitle(menus.getTitle());
+        data.setSubTitle(menus.getSubTitle());
+        data.setCategoryId(menus.getCategoryId());
+        data.setThumbPath(PathUtils.getMenuImagePath(menus.getPath()));
+        data.setContents(PathUtils.getMenuDetailsPath(contents.getPath()));
+        data.setOpened(menus.getOpened());
+        data.setImagePaths(menuPictureList.stream().map(p -> {
+            Map<String, String> m = new HashMap<>();
+            m.put("imageDescription", p.getDescription());
+            m.put("uploadImageUrl", PathUtils.getMenuImagePath(p.getPath()));
+            return m;
+        }).collect(Collectors.toList()));
+        data.setMine(userId == null ? false : userId == menus.getUserId());
+
+        return data;
     }
 }

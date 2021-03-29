@@ -32,7 +32,7 @@ import jp.co.suyama.menu.deliver.model.auto.MenuCategoriesResponse;
 import jp.co.suyama.menu.deliver.model.auto.MenuDataResponse;
 import jp.co.suyama.menu.deliver.model.auto.MenusResponse;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-26T23:09:27.421+09:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-30T01:21:02.180+09:00")
 
 @Validated
 @Api(value = "menu", description = "the menu API")
@@ -68,7 +68,7 @@ public interface MenuApi {
             @ApiResponse(code = 400, message = "200以外の時のは通信失敗をクライアントに通達") })
     @RequestMapping(value = "/menu", produces = { "application/json" }, method = RequestMethod.GET)
     ResponseEntity<MenuDataResponse> getMenu(
-            @NotNull @ApiParam(value = "献立ID", required = true) @Valid @RequestParam(value = "id", required = true) String id);
+            @NotNull @ApiParam(value = "献立ID", required = true) @Valid @RequestParam(value = "id", required = true) Integer id);
 
     @ApiOperation(value = "献立カテゴリ取得", nickname = "getMenuCategories", notes = "献立のカテゴリ一覧を取得する 認証不要 ", response = MenuCategoriesResponse.class, tags = {
             "Menu", })

@@ -27,6 +27,7 @@ import jp.co.suyama.menu.deliver.model.auto.DeleteMenuParam;
 import jp.co.suyama.menu.deliver.model.auto.ErrorInfo;
 import jp.co.suyama.menu.deliver.model.auto.FavoriteMenuParam;
 import jp.co.suyama.menu.deliver.model.auto.MenuCategoriesResponse;
+import jp.co.suyama.menu.deliver.model.auto.MenuData;
 import jp.co.suyama.menu.deliver.model.auto.MenuDataResponse;
 import jp.co.suyama.menu.deliver.model.auto.MenusResponse;
 import jp.co.suyama.menu.deliver.service.MenuService;
@@ -68,9 +69,30 @@ public class MenuController implements MenuApi {
     }
 
     @Override
-    public ResponseEntity<MenuDataResponse> getMenu(@NotNull @Valid String id) {
-        // TODO 自動生成されたメソッド・スタブ
-        return null;
+    public ResponseEntity<MenuDataResponse> getMenu(@NotNull @Valid Integer id) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        // レスポンス作成
+        MenuDataResponse response = new MenuDataResponse();
+
+        // 献立IDの存在チェック
+        if (id == null) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("献立IDが空です。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // 献立内容を取得
+        MenuData menuData = menuService.getMenu(auth.getPrincipal().toString(), id);
+
+        // レスポンスに情報を設定
+        response.setCode(MenuDeliverStatus.SUCCESS);
+        response.setInfo(menuData);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Override

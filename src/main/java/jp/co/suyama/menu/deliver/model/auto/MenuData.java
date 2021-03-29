@@ -15,7 +15,7 @@ import javax.validation.constraints.*;
  * MenuData
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-24T14:39:40.139+09:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-30T01:12:08.040+09:00")
 
 
 
@@ -45,6 +45,9 @@ public class MenuData   {
 
   @JsonProperty("opened")
   private Boolean opened = null;
+
+  @JsonProperty("mine")
+  private Boolean mine = null;
 
   public MenuData id(Integer id) {
     this.id = id;
@@ -214,6 +217,26 @@ public class MenuData   {
     this.opened = opened;
   }
 
+  public MenuData mine(Boolean mine) {
+    this.mine = mine;
+    return this;
+  }
+
+  /**
+   * 自分が投稿したものか
+   * @return mine
+  **/
+  @ApiModelProperty(example = "false", value = "自分が投稿したものか")
+
+
+  public Boolean isMine() {
+    return mine;
+  }
+
+  public void setMine(Boolean mine) {
+    this.mine = mine;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -231,12 +254,13 @@ public class MenuData   {
         Objects.equals(this.thumbPath, menuData.thumbPath) &&
         Objects.equals(this.contents, menuData.contents) &&
         Objects.equals(this.imagePaths, menuData.imagePaths) &&
-        Objects.equals(this.opened, menuData.opened);
+        Objects.equals(this.opened, menuData.opened) &&
+        Objects.equals(this.mine, menuData.mine);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, title, subTitle, categoryId, thumbPath, contents, imagePaths, opened);
+    return Objects.hash(id, title, subTitle, categoryId, thumbPath, contents, imagePaths, opened, mine);
   }
 
   @Override
@@ -252,6 +276,7 @@ public class MenuData   {
     sb.append("    contents: ").append(toIndentedString(contents)).append("\n");
     sb.append("    imagePaths: ").append(toIndentedString(imagePaths)).append("\n");
     sb.append("    opened: ").append(toIndentedString(opened)).append("\n");
+    sb.append("    mine: ").append(toIndentedString(mine)).append("\n");
     sb.append("}");
     return sb.toString();
   }
