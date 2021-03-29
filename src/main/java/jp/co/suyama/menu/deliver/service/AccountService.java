@@ -121,6 +121,7 @@ public class AccountService {
         Users user = new Users();
         user.setEmail(email);
         user.setPassword(password);
+        user.setName("NO_NAME");
         user.setRole(Role.ROLE_USER);
         user.setAvailable(false);
         user.setOncePassword(uuid);
