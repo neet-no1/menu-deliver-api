@@ -85,6 +85,12 @@
 			<version>1.11.983</version>
 		</dependency>
 
+		<!-- パスワード生成 -->
+		<dependency>
+			<groupId>org.passay</groupId>
+			<artifactId>passay</artifactId>
+			<version>1.6.0</version>
+		</dependency>
 
 		<!--SpringFox dependencies -->
 		<dependency>

@@ -2,16 +2,22 @@ package jp.co.suyama.menu.deliver.service;
 
 import java.io.File;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
+import org.passay.CharacterRule;
+import org.passay.EnglishCharacterData;
+import org.passay.PasswordGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -73,6 +79,10 @@ public class AccountService {
     // テンプレートエンジン
     @Autowired
     private VelocityEngine velocityEngine;
+
+    // パスワードエンコーダー
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     /**
      * アカウントを登録する
@@ -260,5 +270,56 @@ public class AccountService {
 
         // 更新
         usersMapper.updateUser(user);
+    }
+
+    /**
+     * パスワードをリセットする
+     *
+     * @param email メールアドレス
+     */
+    public void resetPassword(String email) {
+
+        // ユーザを取得
+        Users user = usersMapper.selectEmail(email);
+
+        // ユーザが存在しない場合エラー
+        if (user == null) {
+            throw new MenuDeliverException("ユーザが存在しません。");
+        }
+
+        // 大文字小文字英数字混合の8桁のパスワードを生成
+        List<CharacterRule> rules = Arrays.asList(new CharacterRule(EnglishCharacterData.UpperCase, 1),
+                new CharacterRule(EnglishCharacterData.LowerCase, 1), new CharacterRule(EnglishCharacterData.Digit, 1));
+        PasswordGenerator generator = new PasswordGenerator();
+        String password = generator.generatePassword(8, rules);
+
+        // パスワードをエンコードする
+        String encodedPassword = passwordEncoder.encode(password);
+
+        // テーブルを更新
+        user.setPassword(encodedPassword);
+        user.setDeleted(false);
+
+        usersMapper.updateUser(user);
+
+        // パスワードリセットのメールを送信する
+        VelocityContext context = new VelocityContext();
+        context.put("mail", email);
+        context.put("password", password);
+
+        StringWriter writer = new StringWriter();
+        velocityEngine.mergeTemplate("mail/PasswordReset.vm", "UTF-8", context, writer);
+
+        // メールを送信する
+        SendEmailRequest request = new SendEmailRequest().withDestination(new Destination().withToAddresses(email))
+                .withMessage(new Message()
+                        .withBody(new Body().withText(new Content().withCharset("UTF-8").withData(writer.toString())))
+                        .withSubject(new Content().withCharset("UTF-8").withData("パスワードリセットのお知らせ")))
+                .withSource(FROM);
+        SendEmailResult mailResult = sesClient.sendEmail(request);
+
+        // ログに記録する
+        log.info("Password Reset: userId:[{}] messageId:[{}] requestId:[{}]", user.getId(), mailResult.getMessageId(),
+                mailResult.getSdkResponseMetadata().getRequestId());
     }
 }
