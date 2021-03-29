@@ -19,10 +19,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jp.co.suyama.menu.deliver.common.S3Access;
 import jp.co.suyama.menu.deliver.exception.MenuDeliverException;
 import jp.co.suyama.menu.deliver.mapper.CompositionsMapperImpl;
+import jp.co.suyama.menu.deliver.mapper.FavoriteMenusMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.MenuCategoriesMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.MenuCompositionsMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.MenuDetailsMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.MenuPicturesMapperImpl;
+import jp.co.suyama.menu.deliver.mapper.MenuViewsMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.MenusMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.UsersMapperImpl;
 import jp.co.suyama.menu.deliver.model.MenuComposition;
@@ -74,6 +76,14 @@ public class MenuService {
     @Autowired
     private MenuCompositionsMapperImpl menuCompositionsMapper;
 
+    // 献立閲覧数テーブル
+    @Autowired
+    private MenuViewsMapperImpl menuViewsMapper;
+
+    // お気に入り献立テーブル
+    @Autowired
+    private FavoriteMenusMapperImpl favoriteMenusMapper;
+
     // ユーザテーブル
     @Autowired
     private UsersMapperImpl usersMapper;
@@ -81,6 +91,69 @@ public class MenuService {
     // 食品成分表テーブル
     @Autowired
     private CompositionsMapperImpl compositionsMapper;
+
+    /**
+     * 献立を削除する
+     *
+     * @param email メールアドレス
+     * @param id    献立ID
+     */
+    public void deleteMenu(String email, int id) {
+
+        // ユーザ情報取得
+        Users user = usersMapper.selectEmail(email);
+
+        // 存在していない場合エラー
+        if (user == null) {
+            throw new MenuDeliverException("ユーザが存在しません。");
+        }
+
+        // 献立を取得
+        Menus menu = menusMapper.selectByPrimaryKey(id);
+
+        if (menu == null) {
+            // 献立が存在しない場合、その場で終了
+            return;
+        }
+
+        // 自分が投稿したものでなければ削除不可
+        if (menu.getUserId() != user.getId()) {
+            throw new MenuDeliverException("削除対象が自身のものではありません。");
+        }
+
+        // 献立を削除
+        menusMapper.deleteByPrimaryKey(id);
+
+        // お気に入り献立を削除
+        favoriteMenusMapper.deleteAllByMenuId(id);
+
+        // 献立画像を取得
+        List<MenuPictures> pictures = menuPicturesMapper.selectAllByMenuId(id);
+
+        // 献立画像を削除
+        menuPicturesMapper.deleteAllByMenuId(id);
+
+        // 献立内容を取得
+        MenuDetails detail = menuDetailsMapper.selectByMenusId(id);
+
+        // 献立内容を削除
+        menuDetailsMapper.deleteByPrimaryKey(detail.getId());
+
+        // 献立閲覧数を削除
+        menuViewsMapper.deleteAllByMenuId(id);
+
+        // 献立素材を削除
+        menuCompositionsMapper.deleteAllByMenuId(id);
+
+        // S3のものをすべて削除する
+        List<String> deleteKeys = new ArrayList<>();
+        deleteKeys.add(PathUtils.getMenuImagePath(menu.getPath()));
+        deleteKeys.add(PathUtils.getMenuDetailsPath(detail.getPath()));
+        deleteKeys.addAll(
+                pictures.stream().map(p -> PathUtils.getMenuImagePath(p.getPath())).collect(Collectors.toList()));
+
+        s3Access.deleteMenuImages(deleteKeys);
+    }
 
     /**
      * 献立を投稿する
@@ -166,7 +239,7 @@ public class MenuService {
 
             // 更新対象が自分のものか確認
             if (existMenus.getUserId() != users.getId()) {
-                throw new MenuDeliverException("更新対象が自分のものではありません。");
+                throw new MenuDeliverException("更新対象が自身のものではありません。");
             }
 
             // サムネイル画像がある場合
@@ -228,8 +301,8 @@ public class MenuService {
         menuCompositionsMapper.registMenuCompositions(menuCompositionsList);
 
         // 献立画像をすべて取得する
-        deletePath = menuPicturesMapper.selectAllByMenuId(menusId).stream().map(m -> m.getPath())
-                .collect(Collectors.toList());
+        deletePath = menuPicturesMapper.selectAllByMenuId(menusId).stream()
+                .map(m -> PathUtils.getMenuImagePath(m.getPath())).collect(Collectors.toList());
 
         // 献立画像を削除する
         menuPicturesMapper.deleteAllByMenuId(menusId);
@@ -269,6 +342,13 @@ public class MenuService {
             filePaths.put(imgPath, files.get(i));
         }
 
+        // S3関連の処理を実装する
+
+        // 献立画像を削除
+        if (!deletePath.isEmpty()) {
+            s3Access.deleteMenuImages(deletePath);
+        }
+
         // サムネイルファイルをS3にアップロードする
         if (thumb != null) {
             File thumbFile = ConvertUtils.convertFile(thumb);
@@ -288,11 +368,6 @@ public class MenuService {
             contentsMap.put("cookery", cookery);
 
             s3Access.uploadMenuDetail(contentsPath, contentsMap);
-        }
-
-        // 献立画像を削除
-        if (!deletePath.isEmpty()) {
-            s3Access.deleteMenuImages(deletePath);
         }
     }
 
@@ -538,7 +613,15 @@ public class MenuService {
         Menus menu = menusMapper.selectByPrimaryKey(id);
 
         // 詰め替えする
-        return convertMenuData(userId, menu);
+        MenuData result = convertMenuData(userId, menu);
+
+        // 献立閲覧数を追加
+        if (!result.isMine()) {
+            // 自分のもの以外の場合追加
+            menuViewsMapper.registMenuViews(result.getId());
+        }
+
+        return result;
     }
 
     /**
