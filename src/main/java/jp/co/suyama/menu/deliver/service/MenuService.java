@@ -26,6 +26,7 @@ import jp.co.suyama.menu.deliver.mapper.MenusMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.UsersMapperImpl;
 import jp.co.suyama.menu.deliver.model.MenuComposition;
 import jp.co.suyama.menu.deliver.model.MenusAndPage;
+import jp.co.suyama.menu.deliver.model.auto.MenuCategoryData;
 import jp.co.suyama.menu.deliver.model.auto.MenuData;
 import jp.co.suyama.menu.deliver.model.auto.PageNation;
 import jp.co.suyama.menu.deliver.model.db.MenuCategories;
@@ -442,6 +443,32 @@ public class MenuService {
 
         // レスポンスに値を設定する
         result.setMenuDataList(menuDataList);
+
+        return result;
+    }
+
+    /**
+     * 献立カテゴリ一覧を取得する
+     * 
+     * @return 献立カテゴリ一覧
+     */
+    public List<MenuCategoryData> getMenuCategories() {
+
+        // レスポンス
+        MenuCategoryData data = null;
+        List<MenuCategoryData> result = new ArrayList<>();
+
+        // カテゴリ一覧を取得する
+        List<MenuCategories> categories = menuCategoriesMapper.selectAll();
+
+        // 詰め替えをする
+        for (MenuCategories category : categories) {
+            data = new MenuCategoryData();
+            data.setId(category.getId());
+            data.setName(category.getName());
+
+            result.add(data);
+        }
 
         return result;
     }

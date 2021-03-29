@@ -1,5 +1,6 @@
 package jp.co.suyama.menu.deliver.controller.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,8 +64,18 @@ public class MenuController implements MenuApi {
 
     @Override
     public ResponseEntity<MenuCategoriesResponse> getMenuCategories() {
-        // TODO 自動生成されたメソッド・スタブ
-        return null;
+
+        // レスポンス作成
+        MenuCategoriesResponse response = new MenuCategoriesResponse();
+
+        // 献立カテゴリ一覧を取得
+        List<Object> menuCategories = new ArrayList<>(menuService.getMenuCategories());
+
+        // レスポンスに情報を設定
+        response.setCode(MenuDeliverStatus.SUCCESS);
+        response.setInfo(menuCategories);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Override
