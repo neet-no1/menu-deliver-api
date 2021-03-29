@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jp.co.suyama.menu.deliver.common.S3Access;
 import jp.co.suyama.menu.deliver.exception.MenuDeliverException;
+import jp.co.suyama.menu.deliver.mapper.CompositionsMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.MenuCategoriesMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.MenuCompositionsMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.MenuDetailsMapperImpl;
@@ -26,9 +27,11 @@ import jp.co.suyama.menu.deliver.mapper.MenusMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.UsersMapperImpl;
 import jp.co.suyama.menu.deliver.model.MenuComposition;
 import jp.co.suyama.menu.deliver.model.MenusAndPage;
+import jp.co.suyama.menu.deliver.model.auto.CompositionData;
 import jp.co.suyama.menu.deliver.model.auto.MenuCategoryData;
 import jp.co.suyama.menu.deliver.model.auto.MenuData;
 import jp.co.suyama.menu.deliver.model.auto.PageNation;
+import jp.co.suyama.menu.deliver.model.db.Compositions;
 import jp.co.suyama.menu.deliver.model.db.MenuCategories;
 import jp.co.suyama.menu.deliver.model.db.MenuCompositions;
 import jp.co.suyama.menu.deliver.model.db.MenuDetails;
@@ -74,6 +77,10 @@ public class MenuService {
     // ユーザテーブル
     @Autowired
     private UsersMapperImpl usersMapper;
+
+    // 食品成分表テーブル
+    @Autowired
+    private CompositionsMapperImpl compositionsMapper;
 
     /**
      * 献立を投稿する
@@ -449,7 +456,7 @@ public class MenuService {
 
     /**
      * 献立カテゴリ一覧を取得する
-     * 
+     *
      * @return 献立カテゴリ一覧
      */
     public List<MenuCategoryData> getMenuCategories() {
@@ -466,6 +473,42 @@ public class MenuService {
             data = new MenuCategoryData();
             data.setId(category.getId());
             data.setName(category.getName());
+
+            result.add(data);
+        }
+
+        return result;
+    }
+
+    /**
+     * 食品成分表情報を取得する
+     *
+     * @return 食品成分表情報
+     */
+    public List<CompositionData> getCompositions() {
+
+        // レスポンス
+        CompositionData data = null;
+        List<CompositionData> result = new ArrayList<>();
+
+        // 食品成分表情報を取得する
+        List<Compositions> compositions = compositionsMapper.selectAll();
+
+        // 詰め替えする
+        for (Compositions composition : compositions) {
+            data = new CompositionData();
+            data.setId(composition.getItemNo());
+            data.setName(composition.getName());
+            data.setRefuse(composition.getRefuse().intValue());
+            data.setEnergy(composition.getEnergy().intValue());
+            data.setProtein(composition.getProtein());
+            data.setLipid(composition.getLipid());
+            data.setCarbohydrate(composition.getCarbohydrate());
+            data.setCalcium(composition.getCalcium().intValue());
+            data.setIron(composition.getIron());
+            data.setCholesterol(composition.getCholesterol().intValue());
+            data.setDietaryFibers(composition.getDietaryFibers());
+            data.setSaltEquivalents(composition.getSaltEquivalents());
 
             result.add(data);
         }

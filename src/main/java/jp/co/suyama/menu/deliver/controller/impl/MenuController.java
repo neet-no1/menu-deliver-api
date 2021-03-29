@@ -52,8 +52,19 @@ public class MenuController implements MenuApi {
 
     @Override
     public ResponseEntity<CompositionsResponse> getCompositions() {
-        // TODO 自動生成されたメソッド・スタブ
-        return null;
+
+        // レスポンス作成
+        CompositionsResponse response = new CompositionsResponse();
+
+        // 食品成分表情報を取得
+        List<Object> compositions = new ArrayList<>(menuService.getCompositions());
+
+        // レスポンスに情報を設定
+        response.setCode(MenuDeliverStatus.SUCCESS);
+        response.setInfo(compositions);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+
     }
 
     @Override
