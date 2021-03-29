@@ -132,8 +132,7 @@ public class FollowService {
         List<Followers> followersList = followersMapper.selectAllFollowersByEmail(email, limit, offset);
 
         // フォロワーユーザIDの一覧を作成
-        List<Integer> followerUserIdList = followersList.stream().map(f -> f.getFollowerUserId())
-                .collect(Collectors.toList());
+        List<Integer> followerUserIdList = followersList.stream().map(f -> f.getUserId()).collect(Collectors.toList());
 
         // 詰め替える
         List<FollowUserData> followerDataList = convertFollowUserData(followerUserIdList);
