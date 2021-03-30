@@ -15,6 +15,7 @@ import jp.co.suyama.menu.deliver.mapper.AnswersMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.QuestionImagesMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.QuestionsMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.UsersMapperImpl;
+import jp.co.suyama.menu.deliver.model.BestAnswerIsExist;
 import jp.co.suyama.menu.deliver.model.QuestionAndPage;
 import jp.co.suyama.menu.deliver.model.auto.AnswerData;
 import jp.co.suyama.menu.deliver.model.auto.PageNation;
@@ -104,6 +105,35 @@ public class QuestionService {
         question.setAnswerId(answerId);
 
         questionsMapper.updateQuestionBestAnswer(question);
+    }
+
+    /**
+     * ベストアンサーを取得する
+     *
+     * @param id 質問ID
+     * @return ベストアンサー
+     */
+    public BestAnswerIsExist getBestAnswer(int id) {
+
+        // レスポンス
+        BestAnswerIsExist result = new BestAnswerIsExist();
+
+        // 質問情報を取得する
+        Questions question = questionsMapper.selectByPrimaryKey(id);
+
+        // 存在していない場合エラー
+        if (question == null) {
+            throw new MenuDeliverException("質問が存在しません。");
+        }
+
+        if (question.getAnswerId() == 0) {
+            result.setExist(false);
+        } else {
+            result.setExist(true);
+            result.setId(question.getAnswerId());
+        }
+
+        return result;
     }
 
     /**

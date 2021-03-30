@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import jp.co.suyama.menu.deliver.common.MenuDeliverConstants;
 import jp.co.suyama.menu.deliver.common.MenuDeliverStatus;
 import jp.co.suyama.menu.deliver.controller.interfaces.QuestionApi;
+import jp.co.suyama.menu.deliver.model.BestAnswerIsExist;
 import jp.co.suyama.menu.deliver.model.auto.AnswerData;
 import jp.co.suyama.menu.deliver.model.auto.AnswersResponse;
 import jp.co.suyama.menu.deliver.model.auto.BasicResponse;
@@ -157,8 +158,30 @@ public class QuestionController implements QuestionApi {
 
     @Override
     public ResponseEntity<BestAnswerResponse> getBestAnswer(@NotNull @Valid Integer id) {
-        // TODO 自動生成されたメソッド・スタブ
-        return null;
+
+        // レスポンス作成
+        BestAnswerResponse response = new BestAnswerResponse();
+
+        // 質問IDの存在チェック
+        if (id == null) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("質問IDが空です。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        Map<String, Object> bestAnswerItems = new HashMap<>();
+        // ベストアンサーを取得
+        BestAnswerIsExist bestAnswer = questionService.getBestAnswer(id);
+        bestAnswerItems.put("exist", bestAnswer.isExist());
+        bestAnswerItems.put("id", bestAnswer.getId());
+
+        // レスポンスに情報を設定
+        response.setCode(MenuDeliverStatus.SUCCESS);
+        response.setInfo(bestAnswerItems);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Override
