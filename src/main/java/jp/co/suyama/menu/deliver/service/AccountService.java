@@ -122,6 +122,7 @@ public class AccountService {
         user.setEmail(email);
         user.setPassword(password);
         user.setName("NO_NAME");
+        user.setIcon("no_image");
         user.setRole(Role.ROLE_USER);
         user.setAvailable(false);
         user.setOncePassword(uuid);
