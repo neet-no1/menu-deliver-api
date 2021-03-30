@@ -13,11 +13,15 @@ import jp.co.suyama.menu.deliver.exception.MenuDeliverException;
 import jp.co.suyama.menu.deliver.mapper.QuestionImagesMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.QuestionsMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.UsersMapperImpl;
+import jp.co.suyama.menu.deliver.model.QuestionAndPage;
+import jp.co.suyama.menu.deliver.model.auto.PageNation;
 import jp.co.suyama.menu.deliver.model.auto.QuestionCategoryData;
+import jp.co.suyama.menu.deliver.model.auto.QuestionData;
 import jp.co.suyama.menu.deliver.model.db.QuestionImages;
 import jp.co.suyama.menu.deliver.model.db.Questions;
 import jp.co.suyama.menu.deliver.model.db.Users;
 import jp.co.suyama.menu.deliver.utils.ConvertUtils;
+import jp.co.suyama.menu.deliver.utils.PageNationUtils;
 import jp.co.suyama.menu.deliver.utils.PathUtils;
 
 @Service
@@ -101,5 +105,126 @@ public class QuestionService {
         categories.add(category);
 
         return categories;
+    }
+
+    /**
+     * 新着質問を取得する
+     *
+     * @param keywordList 検索キーワード
+     * @param page        取得ページ
+     * @return 質問一覧
+     */
+    public QuestionAndPage searchQuestionNewArrival(List<String> keywordList, int page) {
+
+        // レスポンス
+        QuestionAndPage result = new QuestionAndPage();
+
+        // 取得件数
+        int limit = 8;
+
+        // 全体の件数を取得する
+        int count = questionsMapper.countQuestionNewArrival(keywordList);
+
+        // ページネーションを取得
+        PageNation pageNation = PageNationUtils.createPageNation(page, count, limit);
+
+        // 取得ページからoffsetを計算する
+        int offset = (pageNation.getCurrentPage() - 1) * limit;
+
+        // 検索処理
+        List<Questions> questionsList = questionsMapper.searchQuestionNewArrival(keywordList, limit, offset);
+
+        // レスポンスに値を設定
+        result.setQuestionDataList(convertQuestionDataList(null, questionsList));
+        result.setPage(pageNation);
+
+        return result;
+    }
+
+    /**
+     * 未解決・解決済みの質問を検索する
+     *
+     * @param keywordList 検索キーワード
+     * @param page        取得ページ
+     * @param solved      解決済みフラグ
+     * @return 質問一覧
+     */
+    public QuestionAndPage searchQuestion(List<String> keywordList, int page, boolean solved) {
+
+        // レスポンス
+        QuestionAndPage result = new QuestionAndPage();
+
+        // 取得件数
+        int limit = 8;
+
+        // 全体の件数を取得する
+        int count = questionsMapper.countQuestion(keywordList, solved);
+
+        // ページネーションを取得
+        PageNation pageNation = PageNationUtils.createPageNation(page, count, limit);
+
+        // 取得ページからoffsetを計算する
+        int offset = (pageNation.getCurrentPage() - 1) * limit;
+
+        // 検索処理
+        List<Questions> questionsList = questionsMapper.searchQuestion(keywordList, solved, limit, offset);
+
+        // レスポンスに値を設定
+        result.setQuestionDataList(convertQuestionDataList(null, questionsList));
+        result.setPage(pageNation);
+
+        return result;
+    }
+
+    /**
+     * 質問情報リストから関連情報を取得し、質問データリストに変換する
+     *
+     * @param userId       ユーザID(自分の投稿かを判断する)
+     * @param questionList 質問情報リスト
+     * @return 質問データリスト
+     */
+    private List<QuestionData> convertQuestionDataList(Integer userId, List<Questions> questionList) {
+
+        // レスポンス
+        List<QuestionData> questionDataList = new ArrayList<>();
+
+        // 詰め替える
+        for (Questions question : questionList) {
+            // 質問データを追加
+            questionDataList.add(convertQuestionData(userId, question));
+        }
+
+        return questionDataList;
+    }
+
+    /**
+     * 質問情報から関連情報を取得し、質問データに変換する
+     *
+     * @param userId   ユーザID(自分の投稿かを判断する)
+     * @param question 質問情報
+     * @return 質問データ
+     */
+    private QuestionData convertQuestionData(Integer userId, Questions question) {
+
+        // 画像情報を取得する
+        QuestionImages images = questionImagesMapper.selectByQuestionId(question.getId());
+        String imagePath = null;
+        if (images != null) {
+            imagePath = PathUtils.getQuestionImagePath(images.getPath());
+        }
+
+        // ユーザ情報を取得する
+        Users user = usersMapper.selectByPrimaryKey(question.getUserId());
+
+        // データを詰め替える
+        QuestionData data = new QuestionData();
+        data.setId(question.getId());
+        data.setContents(question.getContents());
+        data.setImages(imagePath);
+        data.setUserName(user.getName());
+        data.setUserIcon(PathUtils.getUserIconPath(user.getIcon()));
+        data.setMine(userId == null ? false : userId == question.getUserId());
+
+        return data;
     }
 }

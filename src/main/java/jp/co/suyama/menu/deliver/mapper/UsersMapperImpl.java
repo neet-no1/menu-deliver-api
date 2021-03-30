@@ -22,12 +22,13 @@ public interface UsersMapperImpl extends UsersMapper {
     // @formatter:off
     @Select({
           "insert into users"
-        , "(email, password, name, role, available, once_password, expires, deleted, created_at, updated_at)"
+        , "(email, password, name, icon, role, available, once_password, expires, deleted, created_at, updated_at)"
         , "values"
         , "("
         , "  #{email,jdbcType=VARCHAR},"
         , "  #{password,jdbcType=VARCHAR},"
         , "  #{name,jdbcType=VARCHAR},"
+        , "  #{icon,jdbcType=VARCHAR},"
         , "  #{role,jdbcType=VARCHAR},"
         , "  #{available,jdbcType=BIT},"
         , "  #{oncePassword,jdbcType=VARCHAR},"
