@@ -1,5 +1,8 @@
 package jp.co.suyama.menu.deliver.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +13,7 @@ import jp.co.suyama.menu.deliver.exception.MenuDeliverException;
 import jp.co.suyama.menu.deliver.mapper.QuestionImagesMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.QuestionsMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.UsersMapperImpl;
+import jp.co.suyama.menu.deliver.model.auto.QuestionCategoryData;
 import jp.co.suyama.menu.deliver.model.db.QuestionImages;
 import jp.co.suyama.menu.deliver.model.db.Questions;
 import jp.co.suyama.menu.deliver.model.db.Users;
@@ -74,5 +78,28 @@ public class QuestionService {
             // S3にアップロードする
             s3Access.uploadQuestionImage(imgPath, ConvertUtils.convertFile(img));
         }
+    }
+
+    /**
+     * 質問のカテゴリを取得する
+     *
+     * @return カテゴリリスト
+     */
+    public List<QuestionCategoryData> getCategories() {
+
+        List<QuestionCategoryData> categories = new ArrayList<>();
+
+        // カテゴリ情報は「未解決」「解決済み」の２つあるため、DBに持っていない
+        QuestionCategoryData category = new QuestionCategoryData();
+        category.setId(1);
+        category.setName("未解決");
+        categories.add(category);
+
+        category = new QuestionCategoryData();
+        category.setId(2);
+        category.setName("解決済み");
+        categories.add(category);
+
+        return categories;
     }
 }

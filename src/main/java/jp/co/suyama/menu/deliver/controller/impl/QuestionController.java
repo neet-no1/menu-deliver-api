@@ -1,5 +1,8 @@
 package jp.co.suyama.menu.deliver.controller.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
@@ -62,8 +65,18 @@ public class QuestionController implements QuestionApi {
 
     @Override
     public ResponseEntity<QuestionCategoriesResponse> getQuestionCategories() {
-        // TODO 自動生成されたメソッド・スタブ
-        return null;
+
+        // レスポンス作成
+        QuestionCategoriesResponse response = new QuestionCategoriesResponse();
+
+        // 質問投稿
+        List<Object> categories = new ArrayList<>(questionService.getCategories());
+
+        // レスポンスに情報を設定
+        response.setCode(MenuDeliverStatus.SUCCESS);
+        response.setInfo(categories);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Override
