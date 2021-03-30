@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import jp.co.suyama.menu.deliver.common.S3Access;
 import jp.co.suyama.menu.deliver.exception.MenuDeliverException;
 import jp.co.suyama.menu.deliver.mapper.ArticleDetailsMapperImpl;
+import jp.co.suyama.menu.deliver.mapper.ArticleViewsMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.ArticlesMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.UsersMapperImpl;
 import jp.co.suyama.menu.deliver.model.ArticlesAndPage;
@@ -40,6 +41,10 @@ public class ArticleService {
     // 記事詳細テーブル
     @Autowired
     private ArticleDetailsMapperImpl articleDetailsMapper;
+
+    // 記事閲覧数テーブル
+    @Autowired
+    private ArticleViewsMapperImpl articleViewsMapper;
 
     // ユーザテーブル
     @Autowired
@@ -192,7 +197,7 @@ public class ArticleService {
         // メールアドレスから記事内容以外を取得する
         List<Articles> articlesList = articlesMapper.selectAllFavoriteArticlesByEmail(email, limit, offset);
 
-        List<ArticleData> articleDataList = convertArticleData(articlesList);
+        List<ArticleData> articleDataList = convertArticleDataList(null, articlesList);
 
         // レスポンスに値を設定する
         result.setArticleDataList(articleDataList);
@@ -228,7 +233,7 @@ public class ArticleService {
         // メールアドレスから記事内容以外を取得する
         List<Articles> articlesList = articlesMapper.selectAllByEmail(email, limit, offset);
 
-        List<ArticleData> articleDataList = convertArticleData(articlesList);
+        List<ArticleData> articleDataList = convertArticleDataList(null, articlesList);
 
         // レスポンスに値を設定する
         result.setArticleDataList(articleDataList);
@@ -264,7 +269,7 @@ public class ArticleService {
         // メールアドレスから記事内容以外を取得する
         List<Articles> articlesList = articlesMapper.searchArticles(keywordList, limit, offset);
 
-        List<ArticleData> articleDataList = convertArticleData(articlesList);
+        List<ArticleData> articleDataList = convertArticleDataList(null, articlesList);
 
         // レスポンスに値を設定する
         result.setArticleDataList(articleDataList);
@@ -289,7 +294,7 @@ public class ArticleService {
         // 記事内容以外を取得する
         List<Articles> articlesList = articlesMapper.selectAllNewArrival(limit);
 
-        List<ArticleData> articleDataList = convertArticleData(articlesList);
+        List<ArticleData> articleDataList = convertArticleDataList(null, articlesList);
 
         // レスポンスに値を設定する
         result.setArticleDataList(articleDataList);
@@ -298,44 +303,94 @@ public class ArticleService {
     }
 
     /**
+     * 記事内容を取得する
+     *
+     * @param email メールアドレス
+     * @param id    記事ID
+     * @return 記事内容
+     */
+    public ArticleData getArticle(String email, int id) {
+
+        // ユーザ情報取得
+        Integer userId = null;
+        Users user = usersMapper.selectEmail(email);
+
+        // 存在する場合、ユーザIDを設定
+        if (user != null) {
+            userId = user.getId();
+        }
+
+        // 記事情報を取得する
+        Articles article = articlesMapper.selectByPrimaryKey(id);
+
+        // 存在しない場合エラー
+        if (article == null) {
+            throw new MenuDeliverException("記事が存在しません。");
+        }
+
+        // 詰め替えする
+        ArticleData result = convertArticleData(userId, article);
+
+        // 記事閲覧数を追加
+        if (!result.isMine()) {
+            // 自分のもの以外の場合追加
+            articleViewsMapper.registArticleViews(result.getId());
+        }
+
+        return result;
+    }
+
+    /**
      * 記事情報リストから関連情報を取得し、記事データリストに変換する
      *
+     * @param userId       ユーザID(自分の投稿かを判断する)
      * @param articlesList 記事情報リスト
      * @return 記事データリスト
      */
-    private List<ArticleData> convertArticleData(List<Articles> articlesList) {
+    private List<ArticleData> convertArticleDataList(Integer userId, List<Articles> articlesList) {
 
         // レスポンス記事データ
-        ArticleData data = null;
         List<ArticleData> articleDataList = new ArrayList<>();
 
         // 内容を取得する
         for (Articles articles : articlesList) {
-
-            // ユーザ情報を取得する
-            Users user = usersMapper.selectByPrimaryKey(articles.getUserId());
-
-            // 記事内容を取得する
-            ArticleDetails contents = articleDetailsMapper.selectByArticlesId(articles.getId());
-
-            // データを詰め替える
-            SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd");
-            data = new ArticleData();
-            data.setId(articles.getId());
-            data.setTitle(articles.getTitle());
-            data.setDetail(articles.getStartSentence());
-            data.setImgPath(PathUtils.getArticleImagePath(articles.getPath()));
-            data.setDate(df.format(articles.getUpdatedAt()));
-            data.setUserId(user.getId());
-            data.setUserName(user.getName());
-            data.setUserIconPath(PathUtils.getUserIconPath(user.getIcon()));
-            data.setContents(PathUtils.getArticleDetailsPath(contents.getPath()));
-            data.setOpened(articles.getOpened());
-
             // 記事データを追加
-            articleDataList.add(data);
+            articleDataList.add(convertArticleData(userId, articles));
         }
 
         return articleDataList;
+    }
+
+    /**
+     * 記事情報リストから関連情報を取得し、記事データリストに変換する
+     *
+     * @param userId   ユーザID(自分の投稿かを判断する)
+     * @param articles 記事情報
+     * @return 記事データ
+     */
+    private ArticleData convertArticleData(Integer userId, Articles articles) {
+
+        // ユーザ情報を取得する
+        Users user = usersMapper.selectByPrimaryKey(articles.getUserId());
+
+        // 記事内容を取得する
+        ArticleDetails contents = articleDetailsMapper.selectByArticlesId(articles.getId());
+
+        // データを詰め替える
+        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd");
+        ArticleData data = new ArticleData();
+        data.setId(articles.getId());
+        data.setTitle(articles.getTitle());
+        data.setDetail(articles.getStartSentence());
+        data.setImgPath(PathUtils.getArticleImagePath(articles.getPath()));
+        data.setDate(df.format(articles.getUpdatedAt()));
+        data.setUserId(user.getId());
+        data.setUserName(user.getName());
+        data.setUserIconPath(PathUtils.getUserIconPath(user.getIcon()));
+        data.setContents(PathUtils.getArticleDetailsPath(contents.getPath()));
+        data.setOpened(articles.getOpened());
+        data.setMine(userId == null ? false : userId == articles.getUserId());
+
+        return data;
     }
 }

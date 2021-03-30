@@ -13,7 +13,7 @@ import javax.validation.constraints.*;
  * ArticleData
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-24T14:39:40.139+09:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-30T13:14:40.289+09:00")
 
 
 
@@ -48,6 +48,9 @@ public class ArticleData   {
 
   @JsonProperty("opened")
   private Boolean opened = null;
+
+  @JsonProperty("mine")
+  private Boolean mine = null;
 
   public ArticleData id(Integer id) {
     this.id = id;
@@ -249,6 +252,26 @@ public class ArticleData   {
     this.opened = opened;
   }
 
+  public ArticleData mine(Boolean mine) {
+    this.mine = mine;
+    return this;
+  }
+
+  /**
+   * 自分が投稿したものか
+   * @return mine
+  **/
+  @ApiModelProperty(example = "false", value = "自分が投稿したものか")
+
+
+  public Boolean isMine() {
+    return mine;
+  }
+
+  public void setMine(Boolean mine) {
+    this.mine = mine;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -268,12 +291,13 @@ public class ArticleData   {
         Objects.equals(this.userName, articleData.userName) &&
         Objects.equals(this.userIconPath, articleData.userIconPath) &&
         Objects.equals(this.contents, articleData.contents) &&
-        Objects.equals(this.opened, articleData.opened);
+        Objects.equals(this.opened, articleData.opened) &&
+        Objects.equals(this.mine, articleData.mine);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, title, detail, imgPath, date, userId, userName, userIconPath, contents, opened);
+    return Objects.hash(id, title, detail, imgPath, date, userId, userName, userIconPath, contents, opened, mine);
   }
 
   @Override
@@ -291,6 +315,7 @@ public class ArticleData   {
     sb.append("    userIconPath: ").append(toIndentedString(userIconPath)).append("\n");
     sb.append("    contents: ").append(toIndentedString(contents)).append("\n");
     sb.append("    opened: ").append(toIndentedString(opened)).append("\n");
+    sb.append("    mine: ").append(toIndentedString(mine)).append("\n");
     sb.append("}");
     return sb.toString();
   }

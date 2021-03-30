@@ -19,6 +19,7 @@ import jp.co.suyama.menu.deliver.common.MenuDeliverConstants;
 import jp.co.suyama.menu.deliver.common.MenuDeliverStatus;
 import jp.co.suyama.menu.deliver.controller.interfaces.ArticleApi;
 import jp.co.suyama.menu.deliver.model.ArticlesAndPage;
+import jp.co.suyama.menu.deliver.model.auto.ArticleData;
 import jp.co.suyama.menu.deliver.model.auto.ArticleDataResponse;
 import jp.co.suyama.menu.deliver.model.auto.ArticlesResponse;
 import jp.co.suyama.menu.deliver.model.auto.BasicResponse;
@@ -47,9 +48,30 @@ public class ArticleController implements ArticleApi {
     }
 
     @Override
-    public ResponseEntity<ArticleDataResponse> getArticle(@NotNull @Valid String id) {
-        // TODO 自動生成されたメソッド・スタブ
-        return null;
+    public ResponseEntity<ArticleDataResponse> getArticle(@NotNull @Valid Integer id) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        // レスポンス作成
+        ArticleDataResponse response = new ArticleDataResponse();
+
+        // 記事IDの存在チェック
+        if (id == null) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("記事IDが空です。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // 記事内容を取得
+        ArticleData articleData = articleService.getArticle(auth.getPrincipal().toString(), id);
+
+        // レスポンスに情報を設定
+        response.setCode(MenuDeliverStatus.SUCCESS);
+        response.setInfo(articleData);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Override

@@ -615,6 +615,11 @@ public class MenuService {
         // 献立情報を取得する
         Menus menu = menusMapper.selectByPrimaryKey(id);
 
+        // 存在しない場合エラー
+        if (menu == null) {
+            throw new MenuDeliverException("献立が存在しません。");
+        }
+
         // 詰め替えする
         MenuData result = convertMenuData(userId, menu);
 
@@ -698,8 +703,8 @@ public class MenuService {
     /**
      * 献立情報から関連情報を取得し、献立データに変換する
      *
-     * @param userId    ユーザID(自分の投稿かを判断する)
-     * @param menusList 献立情報
+     * @param userId ユーザID(自分の投稿かを判断する)
+     * @param menus  献立情報
      * @return 献立データ
      */
     private MenuData convertMenuData(Integer userId, Menus menus) {
