@@ -84,8 +84,48 @@ public class QuestionController implements QuestionApi {
 
     @Override
     public ResponseEntity<BasicResponse> decideBestAnswer(@Valid DecideBestAnswerParam decideBestAnswerParam) {
-        // TODO 自動生成されたメソッド・スタブ
-        return null;
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        // レスポンス作成
+        BasicResponse response = new BasicResponse();
+
+        // ログインチェック
+        if (MenuDeliverConstants.UNKNOWN_USER_NAME.equals(auth.getPrincipal().toString())) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("ログインされていません。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // 質問IDの存在チェック
+        if (decideBestAnswerParam.getQuestionId() == null) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("質問IDが空です。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // 回答IDの存在チェック
+        if (decideBestAnswerParam.getAnswerId() == null) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("回答IDが空です。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // ベストアンサー決定
+        questionService.decideBestAnswer(auth.getPrincipal().toString(), decideBestAnswerParam.getQuestionId(),
+                decideBestAnswerParam.getAnswerId());
+
+        // レスポンスに情報を設定
+        response.setCode(MenuDeliverStatus.SUCCESS);
+        response.setInfo(MenuDeliverStatus.SUCCESS);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Override

@@ -58,6 +58,55 @@ public class QuestionService {
     private UsersMapperImpl usersMapper;
 
     /**
+     * ベストアンサーを決定する
+     *
+     * @param email      メールアドレス
+     * @param questionId 質問ID
+     * @param answerId   回答ID
+     */
+    public void decideBestAnswer(String email, int questionId, int answerId) {
+
+        // ユーザ情報取得
+        Users user = usersMapper.selectEmail(email);
+
+        // 存在していない場合エラー
+        if (user == null) {
+            throw new MenuDeliverException("ユーザが存在しません。");
+        }
+
+        // 質問情報取得
+        Questions question = questionsMapper.selectByPrimaryKey(questionId);
+
+        // 存在していない場合エラー
+        if (question == null) {
+            throw new MenuDeliverException("質問が存在しません。");
+        }
+
+        // 自身の質問であること
+        if (question.getUserId() != user.getId()) {
+            throw new MenuDeliverException("自身の質問ではありません。");
+        }
+
+        // 回答情報取得
+        Answers answer = answersMapper.selectByPrimaryKey(answerId);
+
+        // 存在していない場合エラー
+        if (answer == null) {
+            throw new MenuDeliverException("回答が存在しません。");
+        }
+
+        // 回答情報の質問IDが同じでない場合エラー
+        if (answer.getQuestionId() != question.getId()) {
+            throw new MenuDeliverException("対象質問の回答ではありません。");
+        }
+
+        // 質問テーブル更新
+        question.setAnswerId(answerId);
+
+        questionsMapper.updateQuestionBestAnswer(question);
+    }
+
+    /**
      * 回答を投稿する
      *
      * @param email    メールアドレス

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import jp.co.suyama.menu.deliver.mapper.auto.QuestionsMapper;
 import jp.co.suyama.menu.deliver.model.db.Questions;
@@ -28,6 +29,20 @@ public interface QuestionsMapperImpl extends QuestionsMapper {
     })
     // @formatter:on
     public int registQuestion(Questions record);
+
+    /**
+     * ベストアンサーとして、回答IDを更新する
+     */
+    // @formatter:off
+    @Update({
+        "update questions"
+      , "set"
+      , "  answer_id = #{answerId,jdbcType=INTEGER},"
+      , "  updated_at = current_timestamp"
+      , "where id = #{id,jdbcType=INTEGER}"
+    })
+    // @formatter:on
+    public int updateQuestionBestAnswer(Questions record);
 
     /**
      * <pre>
