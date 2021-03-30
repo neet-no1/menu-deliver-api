@@ -4,11 +4,64 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import jp.co.suyama.menu.deliver.mapper.auto.ArticlesMapper;
 import jp.co.suyama.menu.deliver.model.db.Articles;
 
 public interface ArticlesMapperImpl extends ArticlesMapper {
+
+    /**
+     * 記事を登録し、IDを取得する
+     */
+    // @formatter:off
+    @Select({
+          "insert into articles"
+        , "(user_id, title, start_sentence, opened, created_at, updated_at)"
+        , "values"
+        , "("
+        , "  #{userId,jdbcType=INTEGER},"
+        , "  #{title,jdbcType=VARCHAR},"
+        , "  #{startSentence,jdbcType=VARCHAR},"
+        , "  #{opened,jdbcType=BIT},"
+        , "  current_timestamp,"
+        , "  current_timestamp"
+        , ")"
+        , "returning id"
+    })
+    // @formatter:on
+    public int registArticle(Articles record);
+
+    /**
+     * 記事のサムネイル画像のパスを更新する
+     */
+    // @formatter:off
+    @Update({
+          "update articles"
+        , "set"
+        , "path = #{path,jdbcType=VARCHAR}"
+        , "where id = #{id,jdbcType=INTEGER}"
+    })
+    // @formatter:on
+    public void updateArticlesPath(@Param("id") int id, @Param("path") String path);
+
+    /**
+     * 記事を更新する
+     */
+    // @formatter:off
+    @Update({
+          "update articles"
+        , "set"
+        , "  user_id = #{userId,jdbcType=INTEGER},"
+        , "  title = #{title,jdbcType=VARCHAR},"
+        , "  start_sentence = #{startSentence,jdbcType=VARCHAR},"
+        , "  path = #{path,jdbcType=VARCHAR},"
+        , "  opened = #{opened,jdbcType=BIT},"
+        , "  updated_at = current_timestamp"
+        , "where id = #{id,jdbcType=INTEGER}"
+    })
+    // @formatter:on
+    public void updateArticle(Articles record);
 
     /**
      * <pre>

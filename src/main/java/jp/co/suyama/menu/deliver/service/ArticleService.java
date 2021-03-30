@@ -1,5 +1,6 @@
 package jp.co.suyama.menu.deliver.service;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +8,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import jp.co.suyama.menu.deliver.common.S3Access;
+import jp.co.suyama.menu.deliver.exception.MenuDeliverException;
 import jp.co.suyama.menu.deliver.mapper.ArticleDetailsMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.ArticlesMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.UsersMapperImpl;
@@ -17,12 +21,17 @@ import jp.co.suyama.menu.deliver.model.auto.PageNation;
 import jp.co.suyama.menu.deliver.model.db.ArticleDetails;
 import jp.co.suyama.menu.deliver.model.db.Articles;
 import jp.co.suyama.menu.deliver.model.db.Users;
+import jp.co.suyama.menu.deliver.utils.ConvertUtils;
 import jp.co.suyama.menu.deliver.utils.PageNationUtils;
 import jp.co.suyama.menu.deliver.utils.PathUtils;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class ArticleService {
+
+    // S3アクセス
+    @Autowired
+    private S3Access s3Access;
 
     // 記事テーブル
     @Autowired
@@ -35,6 +44,126 @@ public class ArticleService {
     // ユーザテーブル
     @Autowired
     private UsersMapperImpl usersMapper;
+
+    /**
+     * 記事を投稿する
+     *
+     * @param email    メールアドレス
+     * @param id       記事ID 新規追加時は0を指定
+     * @param title    タイトル
+     * @param contents 記事内容
+     * @param thumb    サムネイル画像
+     * @param opened   公開フラグ
+     */
+    public void postArticle(String email, int id, String title, String contents, MultipartFile thumb, boolean opened) {
+
+        // ユーザ除法取得
+        Users users = usersMapper.selectEmail(email);
+        if (users == null) {
+            // ユーザが存在しない場合はエラー
+            throw new MenuDeliverException("ユーザが存在しません。");
+        }
+
+        // 記事ID
+        int articlesId = id;
+
+        // サムネイル画像パス
+        String thumbPath = null;
+
+        // 記事内容パス
+        String contentsPath = null;
+
+        // 削除画像パス
+        List<String> deletePath = new ArrayList<>();
+
+        // 記事テーブルを登録・更新する
+        Articles articles = new Articles();
+        articles.setUserId(users.getId());
+        articles.setTitle(title);
+        articles.setOpened(opened);
+        articles.setStartSentence("");
+
+        if (id == 0) {
+            // IDが0の場合は登録
+            articlesId = articlesMapper.registArticle(articles);
+
+            // サムネイルがある場合
+            if (thumb != null) {
+                // サムネイル画像のパスを更新する
+                String fileName = thumb.getOriginalFilename();
+                thumbPath = PathUtils.createArticleImagePath(articlesId, fileName);
+                articlesMapper.updateArticlesPath(articlesId, thumbPath);
+            }
+
+            // 記事詳細テーブルに登録
+            contentsPath = PathUtils.createArticleDetailsPath(email, articlesId);
+            ArticleDetails articleDetails = new ArticleDetails();
+            articleDetails.setArticleId(articlesId);
+            articleDetails.setPath(contentsPath);
+
+            articleDetailsMapper.registArticleDetails(articleDetails);
+        } else {
+            // IDが0以外の場合は更新
+            Articles existArticles = articlesMapper.selectByPrimaryKey(id);
+            if (existArticles == null) {
+                // DBに対象が存在しない場合はエラー
+                throw new MenuDeliverException("更新対象が存在しません。");
+            }
+
+            // 更新対象が自分のものか確認
+            if (existArticles.getUserId() != users.getId()) {
+                throw new MenuDeliverException("更新対象が自身のものではありません。");
+            }
+
+            // サムネイルがある場合
+            if (thumb != null) {
+                // サムネイル画像のパスを更新する
+                String fileName = thumb.getOriginalFilename();
+                thumbPath = PathUtils.createArticleImagePath(articlesId, fileName);
+                articlesMapper.updateArticlesPath(articlesId, thumbPath);
+                deletePath.add(PathUtils.getArticleImagePath(existArticles.getPath()));
+            }
+
+            // 更新
+            articles.setId(id);
+            articlesMapper.updateArticle(articles);
+
+            // 記事詳細テーブルを更新
+            ArticleDetails existArticleDetails = articleDetailsMapper.selectByArticlesId(articlesId);
+            if (existArticleDetails == null) {
+                // DBに対象が存在しない場合はエラー
+                throw new MenuDeliverException("更新対象が存在しません。");
+            }
+
+            contentsPath = PathUtils.createArticleDetailsPath(email, articlesId);
+            ArticleDetails articleDetails = new ArticleDetails();
+            articleDetails.setArticleId(articlesId);
+            articleDetails.setPath(contentsPath);
+            deletePath.add(PathUtils.getArticleDetailsPath(existArticleDetails.getPath()));
+
+            // 更新
+            articleDetails.setId(existArticleDetails.getId());
+            articleDetailsMapper.updateArticleDetails(articleDetails);
+        }
+
+        // S3関連の処理を実装する
+
+        // 献立画像を削除
+        if (!deletePath.isEmpty()) {
+            s3Access.deleteMenuImages(deletePath);
+        }
+
+        // サムネイルファイルをS3にアップロードする
+        if (thumb != null) {
+            File thumbFile = ConvertUtils.convertFile(thumb);
+            s3Access.uploadArticleImage(thumbPath, thumbFile);
+        }
+
+        // 記事内容をS3にアップロードする
+        if (contentsPath != null) {
+            s3Access.uploadArticleDetail(contentsPath, contents);
+        }
+    }
 
     /**
      * お気に入り記事一覧を取得する

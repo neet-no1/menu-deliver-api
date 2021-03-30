@@ -49,6 +49,16 @@ public class S3Access {
     }
 
     /**
+     * 記事画像をS3にアップロードする
+     *
+     * @param key  オブジェクトキー
+     * @param file 記事画像
+     */
+    public void uploadArticleImage(String key, File file) {
+        s3.putObject(bucket, MenuDeliverConstants.ARTICLE_IMAGE_PATH + key, file);
+    }
+
+    /**
      * 献立内容をS3にアップロードする
      *
      * @param key      オブジェクトキー
@@ -57,6 +67,22 @@ public class S3Access {
     public void uploadMenuDetail(String key, Map<String, String> contents) {
         try {
             s3.putObject(bucket, MenuDeliverConstants.MENU_DETAIL_PATH + key,
+                    objectMapper.writeValueAsString(contents));
+        } catch (Exception e) {
+            // アップロード時にエラー
+            throw new MenuDeliverException("アップロードが失敗しました。", e);
+        }
+    }
+
+    /**
+     * 記事内容をS3にアップロードする
+     *
+     * @param key      オブジェクトキー
+     * @param contents 記事内容
+     */
+    public void uploadArticleDetail(String key, String contents) {
+        try {
+            s3.putObject(bucket, MenuDeliverConstants.ARTICLE_DETAIL_PATH + key,
                     objectMapper.writeValueAsString(contents));
         } catch (Exception e) {
             // アップロード時にエラー

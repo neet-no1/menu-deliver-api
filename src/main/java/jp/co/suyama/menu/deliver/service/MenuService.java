@@ -249,6 +249,7 @@ public class MenuService {
                 String fileName = thumb.getOriginalFilename();
                 thumbPath = PathUtils.createMenuImagePath(menusId, fileName);
                 menus.setPath(thumbPath);
+                deletePath.add(PathUtils.getArticleImagePath(existMenus.getPath()));
             }
 
             // 更新
@@ -266,6 +267,7 @@ public class MenuService {
             MenuDetails menuDetails = new MenuDetails();
             menuDetails.setMenuId(menusId);
             menuDetails.setPath(contentsPath);
+            deletePath.add(PathUtils.getMenuDetailsPath(existMenuDetails.getPath()));
 
             // 更新
             menuDetails.setId(existMenuDetails.getId());
