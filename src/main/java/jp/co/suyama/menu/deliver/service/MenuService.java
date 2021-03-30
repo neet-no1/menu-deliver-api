@@ -94,6 +94,38 @@ public class MenuService {
     private CompositionsMapperImpl compositionsMapper;
 
     /**
+     * 献立がお気に入りに追加されているかを確認する
+     *
+     * @param email メールアドレス
+     * @param id    献立ID
+     * @return 追加済みフラグ
+     */
+    public boolean getFavoriteMenuAdded(String email, int id) {
+
+        // ユーザ情報を取得する
+        Users user = usersMapper.selectEmail(email);
+
+        // 存在していない場合、追加されていないとして返却する
+        if (user == null) {
+            return false;
+        }
+
+        // 献立情報を取得する
+        Menus menu = menusMapper.selectByPrimaryKey(id);
+
+        // 存在していない場合エラー
+        if (menu == null) {
+            throw new MenuDeliverException("献立が存在しません。");
+        }
+
+        // お気に入り情報を取得
+        FavoriteMenus favoriteMenu = favoriteMenusMapper.selectByUserIdMenuId(user.getId(), menu.getId());
+
+        return favoriteMenu != null;
+
+    }
+
+    /**
      * 献立を削除する
      *
      * @param email メールアドレス
