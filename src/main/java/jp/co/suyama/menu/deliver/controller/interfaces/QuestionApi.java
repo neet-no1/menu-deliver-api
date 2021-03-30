@@ -27,7 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.util.List;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-31T00:46:16.066+09:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-31T01:02:43.356+09:00")
 
 @Validated
 @Api(value = "question", description = "the question API")
@@ -42,7 +42,7 @@ public interface QuestionApi {
         produces = { "application/json" }, 
         consumes = { "multipart/form-data" },
         method = RequestMethod.POST)
-    ResponseEntity<BasicResponse> answerQuestion(@ApiParam(value = "内容", required=true) @RequestParam(value="contents", required=true)  String contents,@ApiParam(value = "質問内容の画像") @Valid @RequestPart(value="file", required=true) MultipartFile file);
+    ResponseEntity<BasicResponse> answerQuestion(@ApiParam(value = "質問ID", required=true) @RequestParam(value="id", required=true)  Integer id,@ApiParam(value = "内容", required=true) @RequestParam(value="contents", required=true)  String contents,@ApiParam(value = "質問内容の画像") @Valid @RequestPart(value="file", required=true) MultipartFile file);
 
 
     @ApiOperation(value = "ベストアンサー決定", nickname = "decideBestAnswer", notes = "ベストアンサーを決定する 認証必須 ", response = BasicResponse.class, tags={ "Question", })

@@ -10,6 +10,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import jp.co.suyama.menu.deliver.common.S3Access;
 import jp.co.suyama.menu.deliver.exception.MenuDeliverException;
+import jp.co.suyama.menu.deliver.mapper.AnswerImagesMapperImpl;
+import jp.co.suyama.menu.deliver.mapper.AnswersMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.QuestionImagesMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.QuestionsMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.UsersMapperImpl;
@@ -17,6 +19,8 @@ import jp.co.suyama.menu.deliver.model.QuestionAndPage;
 import jp.co.suyama.menu.deliver.model.auto.PageNation;
 import jp.co.suyama.menu.deliver.model.auto.QuestionCategoryData;
 import jp.co.suyama.menu.deliver.model.auto.QuestionData;
+import jp.co.suyama.menu.deliver.model.db.AnswerImages;
+import jp.co.suyama.menu.deliver.model.db.Answers;
 import jp.co.suyama.menu.deliver.model.db.QuestionImages;
 import jp.co.suyama.menu.deliver.model.db.Questions;
 import jp.co.suyama.menu.deliver.model.db.Users;
@@ -40,9 +44,67 @@ public class QuestionService {
     @Autowired
     private QuestionImagesMapperImpl questionImagesMapper;
 
+    // 回答テーブル
+    @Autowired
+    private AnswersMapperImpl answersMapper;
+
+    // 回答画像テーブル
+    @Autowired
+    private AnswerImagesMapperImpl answerImagesMapper;
+
     // ユーザテーブル
     @Autowired
     private UsersMapperImpl usersMapper;
+
+    /**
+     * 回答を投稿する
+     *
+     * @param email    メールアドレス
+     * @param id       質問ID
+     * @param contents 回答内容
+     * @param img      回答画像
+     */
+    public void postAnswer(String email, int id, String contents, MultipartFile img) {
+
+        // ユーザ情報取得
+        Users users = usersMapper.selectEmail(email);
+
+        // ユーザが存在しない場合はエラー
+        if (users == null) {
+            throw new MenuDeliverException("ユーザが存在しません。");
+        }
+
+        // 質問情報取得
+        Questions question = questionsMapper.selectByPrimaryKey(id);
+
+        // 質問が存在しない場合はエラー
+        if (question == null) {
+            throw new MenuDeliverException("質問が存在しません。");
+        }
+
+        // 回答テーブルに登録する
+        Answers answer = new Answers();
+        answer.setQuestionId(question.getId());
+        answer.setUserId(users.getId());
+        answer.setContents(contents);
+
+        int answerId = answersMapper.registAnswer(answer);
+
+        // 回答画像があれば登録する
+        if (!img.isEmpty()) {
+
+            // 画像パスを取得する
+            String imgPath = PathUtils.createAnswerImagePath(answerId, img.getOriginalFilename());
+            AnswerImages answerImage = new AnswerImages();
+            answerImage.setAnswerId(answerId);
+            answerImage.setPath(imgPath);
+
+            answerImagesMapper.registAnswerImage(answerImage);
+
+            // S3にアップロードする
+            s3Access.uploadAnswerImage(imgPath, ConvertUtils.convertFile(img));
+        }
+    }
 
     /**
      * 質問を投稿する

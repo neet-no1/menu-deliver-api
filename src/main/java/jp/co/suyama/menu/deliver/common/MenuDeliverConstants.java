@@ -28,6 +28,9 @@ public class MenuDeliverConstants {
     // 質問画像パス
     public static final String QUESTION_IMAGE_PATH = "public/question_images/";
 
+    // 回答画像パス
+    public static final String ANSWER_IMAGE_PATH = "public/answer_images/";
+
     // 未ログインユーザ名
     public static final String UNKNOWN_USER_NAME = "anonymousUser";
 

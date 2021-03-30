@@ -35,9 +35,48 @@ public class QuestionController implements QuestionApi {
     private QuestionService questionService;
 
     @Override
-    public ResponseEntity<BasicResponse> answerQuestion(String contents, @Valid MultipartFile file) {
-        // TODO 自動生成されたメソッド・スタブ
-        return null;
+    public ResponseEntity<BasicResponse> answerQuestion(Integer id, String contents, @Valid MultipartFile file) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        // レスポンス作成
+        BasicResponse response = new BasicResponse();
+
+        // ログインチェック
+        if (MenuDeliverConstants.UNKNOWN_USER_NAME.equals(auth.getPrincipal().toString())) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("ログインされていません。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // 質問IDの存在チェック
+        if (id == null) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("質問IDが空です。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // 内容の存在チェック
+        if (contents == null) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("質問内容が空です。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // 回答投稿
+        questionService.postAnswer(auth.getPrincipal().toString(), id, contents, file);
+
+        // レスポンスに情報を設定
+        response.setCode(MenuDeliverStatus.SUCCESS);
+        response.setInfo(MenuDeliverStatus.SUCCESS);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Override

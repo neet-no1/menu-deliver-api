@@ -92,12 +92,22 @@ public class S3Access {
 
     /**
      * 質問画像をS3にアップロードする
-     * 
+     *
      * @param key  オブジェクトキー
      * @param file 質問画像
      */
     public void uploadQuestionImage(String key, File file) {
         s3.putObject(bucket, MenuDeliverConstants.QUESTION_IMAGE_PATH + key, file);
+    }
+
+    /**
+     * 回答画像をS3にアップロードする
+     *
+     * @param key  オブジェクトキー
+     * @param file 回答画像
+     */
+    public void uploadAnswerImage(String key, File file) {
+        s3.putObject(bucket, MenuDeliverConstants.ANSWER_IMAGE_PATH + key, file);
     }
 
     /**
