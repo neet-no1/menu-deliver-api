@@ -57,6 +57,38 @@ public class ArticleService {
     private UsersMapperImpl usersMapper;
 
     /**
+     * 記事がお気に入りに追加されているかを確認する
+     *
+     * @param email メールアドレス
+     * @param id    記事ID
+     * @return 追加済みフラグ
+     */
+    public boolean getFavoriteArticleAdded(String email, int id) {
+
+        // ユーザ情報を取得する
+        Users user = usersMapper.selectEmail(email);
+
+        // 存在していない場合、追加されていないとして返却する
+        if (user == null) {
+            return false;
+        }
+
+        // 記事情報を取得する
+        Articles article = articlesMapper.selectByPrimaryKey(id);
+
+        // 存在していない場合エラー
+        if (article == null) {
+            throw new MenuDeliverException("記事が存在しません。");
+        }
+
+        // お気に入り情報を取得
+        FavoriteArticles favoriteArticle = favoriteArticlesMapper.selectByUserIdArticleId(user.getId(),
+                article.getId());
+
+        return favoriteArticle != null;
+    }
+
+    /**
      * 記事を削除する
      *
      * @param email メールアドレス

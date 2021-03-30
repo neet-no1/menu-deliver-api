@@ -15,6 +15,7 @@ import jp.co.suyama.menu.deliver.controller.interfaces.FavoriteApi;
 import jp.co.suyama.menu.deliver.model.auto.ErrorInfo;
 import jp.co.suyama.menu.deliver.model.auto.FavoriteArticleIsAddedResponse;
 import jp.co.suyama.menu.deliver.model.auto.FavoriteMenuIsAddedResponse;
+import jp.co.suyama.menu.deliver.service.ArticleService;
 import jp.co.suyama.menu.deliver.service.MenuService;
 
 @RestController
@@ -24,10 +25,35 @@ public class FavoriteController implements FavoriteApi {
     @Autowired
     private MenuService menuService;
 
+    // 記事サービス
+    @Autowired
+    private ArticleService articleService;
+
     @Override
     public ResponseEntity<FavoriteArticleIsAddedResponse> favoriteArticleIsAdded(@NotNull @Valid Integer id) {
-        // TODO 自動生成されたメソッド・スタブ
-        return null;
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        // レスポンス作成
+        FavoriteArticleIsAddedResponse response = new FavoriteArticleIsAddedResponse();
+
+        // 記事IDの存在チェック
+        if (id == null) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("記事IDが空です。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // 記事お気に入り追加状態取得
+        boolean added = articleService.getFavoriteArticleAdded(auth.getPrincipal().toString(), id);
+
+        // レスポンスに情報を設定
+        response.setCode(MenuDeliverStatus.SUCCESS);
+        response.setInfo(added);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Override
@@ -47,7 +73,7 @@ public class FavoriteController implements FavoriteApi {
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
 
-        // 献立投稿処理
+        // 献立お気に入り追加状態取得
         boolean added = menuService.getFavoriteMenuAdded(auth.getPrincipal().toString(), id);
 
         // レスポンスに情報を設定
