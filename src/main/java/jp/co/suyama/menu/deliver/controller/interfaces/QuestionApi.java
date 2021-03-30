@@ -27,7 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.util.List;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-31T01:02:43.356+09:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-31T01:18:05.257+09:00")
 
 @Validated
 @Api(value = "question", description = "the question API")
@@ -62,7 +62,7 @@ public interface QuestionApi {
     @RequestMapping(value = "/question/answers",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<AnswersResponse> getAnswers(@NotNull @ApiParam(value = "質問ID", required = true) @Valid @RequestParam(value = "id", required = true) String id);
+    ResponseEntity<AnswersResponse> getAnswers(@NotNull @ApiParam(value = "質問ID", required = true) @Valid @RequestParam(value = "id", required = true) Integer id);
 
 
     @ApiOperation(value = "ベストアンサー取得", nickname = "getBestAnswer", notes = "ベストアンサーが存在するか、しないか 存在する場合は回答IDを取得する 認証不要 ", response = BestAnswerResponse.class, tags={ "Question", })
@@ -72,7 +72,7 @@ public interface QuestionApi {
     @RequestMapping(value = "/question/bestanswer",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<BestAnswerResponse> getBestAnswer(@NotNull @ApiParam(value = "質問ID", required = true) @Valid @RequestParam(value = "id", required = true) String id);
+    ResponseEntity<BestAnswerResponse> getBestAnswer(@NotNull @ApiParam(value = "質問ID", required = true) @Valid @RequestParam(value = "id", required = true) Integer id);
 
 
     @ApiOperation(value = "質問内容取得", nickname = "getQuestion", notes = "質問の内容と回答の一覧を取得する 投稿日順に取得する 認証不要 ", response = QuestionDataResponse.class, tags={ "Question", })

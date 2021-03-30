@@ -1,5 +1,8 @@
 package jp.co.suyama.menu.deliver.mapper;
 
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import jp.co.suyama.menu.deliver.mapper.auto.AnswersMapper;
@@ -26,4 +29,19 @@ public interface AnswersMapperImpl extends AnswersMapper {
     })
     // @formatter:on
     public int registAnswer(Answers record);
+
+    /**
+     * 回答一覧を取得する
+     */
+    // @formatter:off
+    @Select({
+          "select"
+        , "  *"
+        , "from answers"
+        , "where"
+        , "question_id = #{questionId,jdbcType=INTEGER}"
+        , "order by updated_at desc"
+    })
+    // @formatter:on
+    public List<Answers> selectAllByQuestionId(@Param("questionId") int questionId);
 }

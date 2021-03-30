@@ -16,6 +16,7 @@ import jp.co.suyama.menu.deliver.mapper.QuestionImagesMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.QuestionsMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.UsersMapperImpl;
 import jp.co.suyama.menu.deliver.model.QuestionAndPage;
+import jp.co.suyama.menu.deliver.model.auto.AnswerData;
 import jp.co.suyama.menu.deliver.model.auto.PageNation;
 import jp.co.suyama.menu.deliver.model.auto.QuestionCategoryData;
 import jp.co.suyama.menu.deliver.model.auto.QuestionData;
@@ -104,6 +105,29 @@ public class QuestionService {
             // S3にアップロードする
             s3Access.uploadAnswerImage(imgPath, ConvertUtils.convertFile(img));
         }
+    }
+
+    /**
+     * 回答一覧を取得する
+     *
+     * @param id 質問ID
+     * @return 回答一覧
+     */
+    public List<AnswerData> getAnswers(int id) {
+
+        // 質問情報を取得する
+        Questions question = questionsMapper.selectByPrimaryKey(id);
+
+        // 存在しない場合エラー
+        if (question == null) {
+            throw new MenuDeliverException("質問が存在しません。");
+        }
+
+        // 回答一覧を取得する
+        List<Answers> answers = answersMapper.selectAllByQuestionId(id);
+
+        return convertAnswerDataList(answers);
+
     }
 
     /**
@@ -318,6 +342,55 @@ public class QuestionService {
         data.setUserName(user.getName());
         data.setUserIcon(PathUtils.getUserIconPath(user.getIcon()));
         data.setMine(userId == null ? false : userId == question.getUserId());
+
+        return data;
+    }
+
+    /**
+     * 回答情報リストから関連情報を取得し、回答データリストに変換する
+     *
+     * @param answerList 回答情報リスト
+     * @return 回答データリスト
+     */
+    private List<AnswerData> convertAnswerDataList(List<Answers> answerList) {
+
+        // レスポンス
+        List<AnswerData> answerDataList = new ArrayList<>();
+
+        // 詰め替える
+        for (Answers answer : answerList) {
+            // 回答データを追加
+            answerDataList.add(convertAnswerData(answer));
+        }
+
+        return answerDataList;
+    }
+
+    /**
+     * 回答情報から関連情報を取得し、回答データに変換する
+     *
+     * @param answer 回答情報
+     * @return 回答データ
+     */
+    private AnswerData convertAnswerData(Answers answer) {
+
+        // 画像情報を取得する
+        AnswerImages images = answerImagesMapper.selectByAnswerId(answer.getId());
+        String imagePath = null;
+        if (images != null) {
+            imagePath = PathUtils.getAnswerImagePath(images.getPath());
+        }
+
+        // ユーザ情報を取得する
+        Users user = usersMapper.selectByPrimaryKey(answer.getUserId());
+
+        // データを詰め替える
+        AnswerData data = new AnswerData();
+        data.setId(answer.getId());
+        data.setContents(answer.getContents());
+        data.setImages(imagePath);
+        data.setUserName(user.getName());
+        data.setUserIcon(PathUtils.getUserIconPath(user.getIcon()));
 
         return data;
     }

@@ -1,7 +1,9 @@
 package jp.co.suyama.menu.deliver.controller.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -17,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import jp.co.suyama.menu.deliver.common.MenuDeliverConstants;
 import jp.co.suyama.menu.deliver.common.MenuDeliverStatus;
 import jp.co.suyama.menu.deliver.controller.interfaces.QuestionApi;
+import jp.co.suyama.menu.deliver.model.auto.AnswerData;
 import jp.co.suyama.menu.deliver.model.auto.AnswersResponse;
 import jp.co.suyama.menu.deliver.model.auto.BasicResponse;
 import jp.co.suyama.menu.deliver.model.auto.BestAnswerResponse;
@@ -86,13 +89,34 @@ public class QuestionController implements QuestionApi {
     }
 
     @Override
-    public ResponseEntity<AnswersResponse> getAnswers(@NotNull @Valid String id) {
-        // TODO 自動生成されたメソッド・スタブ
-        return null;
+    public ResponseEntity<AnswersResponse> getAnswers(@NotNull @Valid Integer id) {
+
+        // レスポンス作成
+        AnswersResponse response = new AnswersResponse();
+
+        // 質問IDの存在チェック
+        if (id == null) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("質問IDが空です。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        Map<String, Object> answerItems = new HashMap<>();
+        // 回答一覧取得
+        List<AnswerData> answerDataList = questionService.getAnswers(id);
+        answerItems.put("answers", answerDataList);
+
+        // レスポンスに情報を設定
+        response.setCode(MenuDeliverStatus.SUCCESS);
+        response.setInfo(answerItems);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<BestAnswerResponse> getBestAnswer(@NotNull @Valid String id) {
+    public ResponseEntity<BestAnswerResponse> getBestAnswer(@NotNull @Valid Integer id) {
         // TODO 自動生成されたメソッド・スタブ
         return null;
     }
