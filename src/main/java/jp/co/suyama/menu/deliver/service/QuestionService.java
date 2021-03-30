@@ -177,6 +177,38 @@ public class QuestionService {
     }
 
     /**
+     * 質問内容を取得する
+     *
+     * @param email メールアドレス
+     * @param id    質問ID
+     * @return 質問内容
+     */
+    public QuestionData getQuestion(String email, int id) {
+
+        // ユーザ情報取得
+        Integer userId = null;
+        Users user = usersMapper.selectEmail(email);
+
+        // 存在する場合、ユーザIDを設定
+        if (user != null) {
+            userId = user.getId();
+        }
+
+        // 質問情報を取得する
+        Questions question = questionsMapper.selectByPrimaryKey(id);
+
+        // 存在しない場合エラー
+        if (question == null) {
+            throw new MenuDeliverException("質問が存在しません。");
+        }
+
+        // 詰め替えする
+        QuestionData result = convertQuestionData(userId, question);
+
+        return result;
+    }
+
+    /**
      * 質問情報リストから関連情報を取得し、質問データリストに変換する
      *
      * @param userId       ユーザID(自分の投稿かを判断する)

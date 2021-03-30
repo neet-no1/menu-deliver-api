@@ -23,6 +23,7 @@ import jp.co.suyama.menu.deliver.model.auto.BestAnswerResponse;
 import jp.co.suyama.menu.deliver.model.auto.DecideBestAnswerParam;
 import jp.co.suyama.menu.deliver.model.auto.ErrorInfo;
 import jp.co.suyama.menu.deliver.model.auto.QuestionCategoriesResponse;
+import jp.co.suyama.menu.deliver.model.auto.QuestionData;
 import jp.co.suyama.menu.deliver.model.auto.QuestionDataResponse;
 import jp.co.suyama.menu.deliver.service.QuestionService;
 
@@ -58,9 +59,30 @@ public class QuestionController implements QuestionApi {
     }
 
     @Override
-    public ResponseEntity<QuestionDataResponse> getQuestion(@NotNull @Valid String id) {
-        // TODO 自動生成されたメソッド・スタブ
-        return null;
+    public ResponseEntity<QuestionDataResponse> getQuestion(@NotNull @Valid Integer id) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        // レスポンス作成
+        QuestionDataResponse response = new QuestionDataResponse();
+
+        // 質問IDの存在チェック
+        if (id == null) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("質問IDが空です。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // 質問投稿
+        QuestionData questionData = questionService.getQuestion(auth.getPrincipal().toString(), id);
+
+        // レスポンスに情報を設定
+        response.setCode(MenuDeliverStatus.SUCCESS);
+        response.setInfo(questionData);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Override

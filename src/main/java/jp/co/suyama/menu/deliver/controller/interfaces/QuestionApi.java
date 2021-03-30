@@ -27,7 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.util.List;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-24T14:39:40.139+09:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-03-31T00:46:16.066+09:00")
 
 @Validated
 @Api(value = "question", description = "the question API")
@@ -82,7 +82,7 @@ public interface QuestionApi {
     @RequestMapping(value = "/question",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<QuestionDataResponse> getQuestion(@NotNull @ApiParam(value = "質問ID", required = true) @Valid @RequestParam(value = "id", required = true) String id);
+    ResponseEntity<QuestionDataResponse> getQuestion(@NotNull @ApiParam(value = "質問ID", required = true) @Valid @RequestParam(value = "id", required = true) Integer id);
 
 
     @ApiOperation(value = "質問カテゴリ取得", nickname = "getQuestionCategories", notes = "質問のカテゴリ一覧を取得する 認証不要 ", response = QuestionCategoriesResponse.class, tags={ "Question", })
