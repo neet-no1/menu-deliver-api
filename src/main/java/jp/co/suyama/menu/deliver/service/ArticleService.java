@@ -15,6 +15,7 @@ import jp.co.suyama.menu.deliver.exception.MenuDeliverException;
 import jp.co.suyama.menu.deliver.mapper.ArticleDetailsMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.ArticleViewsMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.ArticlesMapperImpl;
+import jp.co.suyama.menu.deliver.mapper.FavoriteArticlesMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.UsersMapperImpl;
 import jp.co.suyama.menu.deliver.model.ArticlesAndPage;
 import jp.co.suyama.menu.deliver.model.auto.ArticleData;
@@ -46,9 +47,65 @@ public class ArticleService {
     @Autowired
     private ArticleViewsMapperImpl articleViewsMapper;
 
+    // お気に入り記事テーブル
+    @Autowired
+    private FavoriteArticlesMapperImpl favoriteArticlesMapper;
+
     // ユーザテーブル
     @Autowired
     private UsersMapperImpl usersMapper;
+
+    /**
+     * 記事を削除する
+     *
+     * @param email メールアドレス
+     * @param id    記事ID
+     */
+    public void deleteArticle(String email, int id) {
+
+        // ユーザ情報取得
+        Users user = usersMapper.selectEmail(email);
+
+        // 存在していない場合エラー
+        if (user == null) {
+            throw new MenuDeliverException("ユーザが存在しません。");
+        }
+
+        // 記事を取得
+        Articles article = articlesMapper.selectByPrimaryKey(id);
+
+        if (article == null) {
+            // 記事が存在しない場合、その場で終了
+            return;
+        }
+
+        // 自分が投稿したものでなければ削除不可
+        if (article.getUserId() != user.getId()) {
+            throw new MenuDeliverException("削除対象が自身のものではありません。");
+        }
+
+        // 記事を削除
+        articlesMapper.deleteByPrimaryKey(id);
+
+        // お気に入り記事を削除
+        favoriteArticlesMapper.deleteAllByArticleId(id);
+
+        // 記事内容を取得
+        ArticleDetails details = articleDetailsMapper.selectByArticlesId(id);
+
+        // 記事内容を削除
+        articleDetailsMapper.deleteByPrimaryKey(details.getId());
+
+        // 記事閲覧数を削除
+        articleViewsMapper.deleteAllByArticleId(id);
+
+        // S3のものをすべて削除する
+        List<String> deleteKeys = new ArrayList<>();
+        deleteKeys.add(PathUtils.getArticleImagePath(article.getPath()));
+        deleteKeys.add(PathUtils.getArticleDetailsPath(details.getPath()));
+
+        s3Access.deleteItems(deleteKeys);
+    }
 
     /**
      * 記事を投稿する
@@ -87,6 +144,7 @@ public class ArticleService {
         articles.setTitle(title);
         articles.setOpened(opened);
         articles.setStartSentence("");
+        articles.setPath("no_image");
 
         if (id == 0) {
             // IDが0の場合は登録
@@ -125,7 +183,7 @@ public class ArticleService {
                 // サムネイル画像のパスを更新する
                 String fileName = thumb.getOriginalFilename();
                 thumbPath = PathUtils.createArticleImagePath(articlesId, fileName);
-                articlesMapper.updateArticlesPath(articlesId, thumbPath);
+                articles.setPath(thumbPath);
                 deletePath.add(PathUtils.getArticleImagePath(existArticles.getPath()));
             }
 
@@ -155,7 +213,7 @@ public class ArticleService {
 
         // 献立画像を削除
         if (!deletePath.isEmpty()) {
-            s3Access.deleteMenuImages(deletePath);
+            s3Access.deleteItems(deletePath);
         }
 
         // サムネイルファイルをS3にアップロードする

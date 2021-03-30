@@ -153,7 +153,7 @@ public class MenuService {
         deleteKeys.addAll(
                 pictures.stream().map(p -> PathUtils.getMenuImagePath(p.getPath())).collect(Collectors.toList()));
 
-        s3Access.deleteMenuImages(deleteKeys);
+        s3Access.deleteItems(deleteKeys);
     }
 
     /**
@@ -209,6 +209,7 @@ public class MenuService {
         menus.setCategoryId(categoryId);
         menus.setOpened(opened);
         menus.setUserId(users.getId());
+        menus.setPath("no_image");
 
         if (id == 0) {
             // IDが0の場合は登録
@@ -349,7 +350,7 @@ public class MenuService {
 
         // 献立画像を削除
         if (!deletePath.isEmpty()) {
-            s3Access.deleteMenuImages(deletePath);
+            s3Access.deleteItems(deletePath);
         }
 
         // サムネイルファイルをS3にアップロードする

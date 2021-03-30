@@ -1,5 +1,6 @@
 package jp.co.suyama.menu.deliver.mapper;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 
@@ -24,4 +25,14 @@ public interface ArticleViewsMapperImpl extends ArticleViewsMapper {
     // @formatter:on
     int registArticleViews(@Param("articleId") int articleId);
 
+    /**
+     * 記事IDを元に全ての記事閲覧数を削除する
+     */
+    // @formatter:off
+    @Delete({
+          "delete from article_views"
+        , "where article_id = #{articleId,jdbcType=INTEGER}"
+    })
+    // @formatter:on
+    public void deleteAllByArticleId(@Param("articleId") int articleId);
 }

@@ -91,11 +91,11 @@ public class S3Access {
     }
 
     /**
-     * 献立画像を複数削除する
+     * S3オブジェクトを複数削除する
      *
      * @param keys オブジェクトキーリスト
      */
-    public void deleteMenuImages(List<String> keys) {
+    public void deleteItems(List<String> keys) {
         DeleteObjectsRequest dor = new DeleteObjectsRequest(bucket).withKeys(keys.toArray(new String[] {}));
         s3.deleteObjects(dor);
     }
