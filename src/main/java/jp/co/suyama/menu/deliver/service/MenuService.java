@@ -34,6 +34,7 @@ import jp.co.suyama.menu.deliver.model.auto.MenuCategoryData;
 import jp.co.suyama.menu.deliver.model.auto.MenuData;
 import jp.co.suyama.menu.deliver.model.auto.PageNation;
 import jp.co.suyama.menu.deliver.model.db.Compositions;
+import jp.co.suyama.menu.deliver.model.db.FavoriteMenus;
 import jp.co.suyama.menu.deliver.model.db.MenuCategories;
 import jp.co.suyama.menu.deliver.model.db.MenuCompositions;
 import jp.co.suyama.menu.deliver.model.db.MenuDetails;
@@ -622,6 +623,53 @@ public class MenuService {
         }
 
         return result;
+    }
+
+    /**
+     * 献立をお気に入りに登録する
+     *
+     * @param email メールアドレス
+     * @param id    献立ID
+     * @param added 追加・解除フラグ
+     */
+    public void favoriteMenu(String email, int id, boolean added) {
+
+        // ユーザ情報取得
+        Users user = usersMapper.selectEmail(email);
+
+        // 存在していない場合エラー
+        if (user == null) {
+            throw new MenuDeliverException("ユーザが存在しません。");
+        }
+
+        // 献立情報種特区
+        Menus menu = menusMapper.selectByPrimaryKey(id);
+
+        // 存在していない場合エラー
+        if (menu == null) {
+            throw new MenuDeliverException("献立が存在しません。");
+        }
+
+        if (added) {
+            // 追加処理
+            // 現在存在するか確認する
+            FavoriteMenus favoriteMenu = favoriteMenusMapper.selectByUserIdMenuId(user.getId(), menu.getId());
+
+            if (favoriteMenu != null) {
+                // 存在する場合、何もせず終了
+                return;
+            }
+
+            // 追加
+            FavoriteMenus registFavoriteMenu = new FavoriteMenus();
+            registFavoriteMenu.setUserId(user.getId());
+            registFavoriteMenu.setMenuId(menu.getId());
+
+            favoriteMenusMapper.registFavoriteMenus(registFavoriteMenu);
+        } else {
+            // 解除処理
+            favoriteMenusMapper.deleteByUserIdMenuId(user.getId(), menu.getId());
+        }
     }
 
     /**

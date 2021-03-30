@@ -77,8 +77,48 @@ public class MenuController implements MenuApi {
 
     @Override
     public ResponseEntity<BasicResponse> favoriteMenu(@Valid FavoriteMenuParam favoriteMenuParam) {
-        // TODO 自動生成されたメソッド・スタブ
-        return null;
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        // レスポンス作成
+        BasicResponse response = new BasicResponse();
+
+        // ログインチェック
+        if (MenuDeliverConstants.UNKNOWN_USER_NAME.equals(auth.getPrincipal().toString())) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("ログインされていません。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // 献立IDの存在チェック
+        if (favoriteMenuParam.getId() == null) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("献立IDが空です。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // 追加・解除フラグの存在チェック
+        if (favoriteMenuParam.isAdded() == null) {
+            response.setCode(MenuDeliverStatus.FAILED);
+            ErrorInfo error = new ErrorInfo();
+            error.setErrorMessage("追加・解除フラグが空です。");
+            response.setErrorInfo(error);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        // お気に入りへの追加・解除を行う
+        menuService.favoriteMenu(auth.getPrincipal().toString(), favoriteMenuParam.getId().intValue(),
+                favoriteMenuParam.isAdded().booleanValue());
+
+        // レスポンスに情報を設定
+        response.setCode(MenuDeliverStatus.SUCCESS);
+        response.setInfo(MenuDeliverStatus.SUCCESS);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Override
