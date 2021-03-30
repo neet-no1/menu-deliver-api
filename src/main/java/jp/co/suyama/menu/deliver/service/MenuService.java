@@ -650,7 +650,7 @@ public class MenuService {
             throw new MenuDeliverException("ユーザが存在しません。");
         }
 
-        // 献立情報種特区
+        // 献立情報取得
         Menus menu = menusMapper.selectByPrimaryKey(id);
 
         // 存在していない場合エラー

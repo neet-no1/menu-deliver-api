@@ -22,6 +22,7 @@ import jp.co.suyama.menu.deliver.model.auto.ArticleData;
 import jp.co.suyama.menu.deliver.model.auto.PageNation;
 import jp.co.suyama.menu.deliver.model.db.ArticleDetails;
 import jp.co.suyama.menu.deliver.model.db.Articles;
+import jp.co.suyama.menu.deliver.model.db.FavoriteArticles;
 import jp.co.suyama.menu.deliver.model.db.Users;
 import jp.co.suyama.menu.deliver.utils.ConvertUtils;
 import jp.co.suyama.menu.deliver.utils.PageNationUtils;
@@ -225,6 +226,55 @@ public class ArticleService {
         // 記事内容をS3にアップロードする
         if (contentsPath != null) {
             s3Access.uploadArticleDetail(contentsPath, contents);
+        }
+    }
+
+    /**
+     * 記事をお気に入りに登録する
+     *
+     * @param email メールアドレス
+     * @param id    記事ID
+     * @param added 追加・解除フラグ
+     */
+    public void favoriteArticle(String email, int id, boolean added) {
+
+        // ユーザ情報取得
+        Users user = usersMapper.selectEmail(email);
+
+        // 存在していない場合エラー
+        if (user == null) {
+            throw new MenuDeliverException("ユーザが存在しません。");
+        }
+
+        // 記事情報取得
+        Articles article = articlesMapper.selectByPrimaryKey(id);
+
+        // 存在していない場合エラー
+        if (article == null) {
+            throw new MenuDeliverException("記事が存在しません。");
+        }
+
+        if (added) {
+            // 追加処理
+            // 存在するか確認
+            FavoriteArticles favoriteArticle = favoriteArticlesMapper.selectByUserIdArticleId(user.getId(),
+                    article.getId());
+
+            if (favoriteArticle != null) {
+                // 存在する場合、何もせず終了
+                return;
+            }
+
+            // 追加
+            FavoriteArticles registFavoriteArticle = new FavoriteArticles();
+            registFavoriteArticle.setUserId(user.getId());
+            registFavoriteArticle.setArticleId(article.getId());
+
+            favoriteArticlesMapper.registFavoriteArticles(registFavoriteArticle);
+
+        } else {
+            // 解除処理
+            favoriteArticlesMapper.deleteByUserIdArticleId(user.getId(), article.getId());
         }
     }
 
