@@ -25,6 +25,9 @@ public class MenuDeliverConstants {
     // おすすめ記事内容パス
     public static final String RECOMMEND_DETAIL_PATH = "public/recommend_contents/";
 
+    // 質問画像パス
+    public static final String QUESTION_IMAGE_PATH = "public/question_images/";
+
     // 未ログインユーザ名
     public static final String UNKNOWN_USER_NAME = "anonymousUser";
 

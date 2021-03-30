@@ -227,7 +227,7 @@ public class AccountService {
         // アイコンのパスを取得
         String iconPath = MenuDeliverConstants.NO_IMAGE_USER_ICON;
 
-        if (icon != null) {
+        if (!icon.isEmpty()) {
             iconPath = PathUtils.createUserIconPath(user.getId(), previousEmail);
         }
 
@@ -239,7 +239,7 @@ public class AccountService {
         usersMapper.updateUser(user);
 
         // ユーザアイコンをS3にアップロードする
-        if (icon != null) {
+        if (!icon.isEmpty()) {
             File file = ConvertUtils.convertFile(icon);
             s3Access.uploadUserIcon(iconPath, file);
         }

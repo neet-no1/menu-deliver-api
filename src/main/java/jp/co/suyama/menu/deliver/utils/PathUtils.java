@@ -58,6 +58,13 @@ public class PathUtils {
     }
 
     /**
+     * 質問画像のパスを生成する
+     */
+    public static String createQuestionImagePath(int questionId, String fileName) {
+        return questionId + "_" + encodeUrl(encrypt(fileName));
+    }
+
+    /**
      * 献立詳細のパスを取得する
      */
     public static String getMenuDetailsPath(String path) {
@@ -100,10 +107,17 @@ public class PathUtils {
     }
 
     /**
-     * おすすめ記事画像のパスを取得する
+     * おすすめ記事詳細のパスを取得する
      */
     public static String getRecommendDetailsPath(String path) {
         return MenuDeliverConstants.RECOMMEND_DETAIL_PATH + path;
+    }
+
+    /**
+     * 質問画像のパスを取得する
+     */
+    public static String getQuestionImagePath(String path) {
+        return MenuDeliverConstants.QUESTION_IMAGE_PATH + path;
     }
 
     private static String encodeUrl(String param) {

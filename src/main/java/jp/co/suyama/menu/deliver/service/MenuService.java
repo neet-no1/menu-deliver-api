@@ -216,7 +216,7 @@ public class MenuService {
             menusId = menusMapper.registMenu(menus);
 
             // サムネイル画像がある場合
-            if (thumb != null) {
+            if (!thumb.isEmpty()) {
                 // サムネイル画像のパスを更新する
                 String fileName = thumb.getOriginalFilename();
                 thumbPath = PathUtils.createMenuImagePath(menusId, fileName);
@@ -245,7 +245,7 @@ public class MenuService {
             }
 
             // サムネイル画像がある場合
-            if (thumb != null) {
+            if (!thumb.isEmpty()) {
                 // サムネイル画像のパスを更新する
                 String fileName = thumb.getOriginalFilename();
                 thumbPath = PathUtils.createMenuImagePath(menusId, fileName);
@@ -354,7 +354,7 @@ public class MenuService {
         }
 
         // サムネイルファイルをS3にアップロードする
-        if (thumb != null) {
+        if (!thumb.isEmpty()) {
             File thumbFile = ConvertUtils.convertFile(thumb);
             s3Access.uploadMenuImage(thumbPath, thumbFile);
         }
