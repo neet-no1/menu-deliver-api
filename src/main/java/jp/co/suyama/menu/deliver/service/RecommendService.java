@@ -19,7 +19,7 @@ public class RecommendService {
 
     /**
      * おすすめ記事情報を表示するためのパラメタを取得
-     * 
+     *
      * @return おすすめ記事情報表示パラメタ
      */
     public RecommendMetaData getRecommendMetaData() {
@@ -30,9 +30,14 @@ public class RecommendService {
         // 情報取得
         RecommendArticles recommend = recommendArticlesMapper.selectByPrimaryKey(0);
 
-        // 詰め替え
-        result.setId(recommend.getId());
-        result.setImgPath(PathUtils.getRecommendImagePath(recommend.getPath()));
+        // おすすめ情報が空の場合、空の情報を返却する
+        if (recommend == null) {
+            result.setId(-1);
+            result.setImgPath(null);
+        } else {
+            result.setId(recommend.getId());
+            result.setImgPath(PathUtils.getRecommendImagePath(recommend.getPath()));
+        }
 
         return result;
     }
