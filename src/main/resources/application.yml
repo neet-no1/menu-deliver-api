@@ -33,7 +33,7 @@ aws:
   s3:
     bucket: ${AWS_S3_BUCKET}
 
-domain: menu-deliver.work
+domain: wwww.menu-deliver.work
 
 ---
 spring:
