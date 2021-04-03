@@ -46,7 +46,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             // フォームベースの認証
             .formLogin()
                 // ログインページのURL
-                .loginPage("/login")
+                //.loginPage("/login")
                 // ログイン処理を行うURL
                 .loginProcessingUrl("/login")
                 // ユーザIDのパラメタ名
@@ -63,23 +63,24 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutUrl("/logout")
                 .logoutSuccessHandler(new LogoutHandler())
                 .permitAll()
-                .and()
             // csrf設定
             // REST APIなので無効
+            .and()
             .csrf().disable()
             /*.csrf(csrf -> csrf
                 // csrfトークンをクッキーに保存するように設定
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))*/
             // cors設定
-            .cors()
-                .configurationSource(this.corsConfigurationSource());
+            //.cors()
+            //    .configurationSource(this.corsConfigurationSource());
+            ;
         // @formatter:on
     }
 
     private CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         // corsConfiguration.addAllowedMethod("GET");
-        // corsConfiguration.addAllowedOrigin("http://example.com");
+        corsConfiguration.addAllowedOrigin("https://www.menu-deliver.work");
 
         UrlBasedCorsConfigurationSource corsSource = new UrlBasedCorsConfigurationSource();
         corsSource.registerCorsConfiguration("/**", corsConfiguration);
