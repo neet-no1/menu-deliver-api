@@ -171,7 +171,7 @@ public class QuestionService {
         int answerId = answersMapper.registAnswer(answer);
 
         // 回答画像があれば登録する
-        if (!img.isEmpty()) {
+        if (img != null && !img.isEmpty()) {
 
             // 画像パスを取得する
             String imgPath = PathUtils.createAnswerImagePath(answerId, img.getOriginalFilename());
@@ -182,7 +182,7 @@ public class QuestionService {
             answerImagesMapper.registAnswerImage(answerImage);
 
             // S3にアップロードする
-            s3Access.uploadAnswerImage(imgPath, ConvertUtils.convertFile(img));
+            s3Access.uploadAnswerImage(imgPath, ConvertUtils.convertFile(img), img.getContentType(), img.getSize());
         }
     }
 
@@ -234,7 +234,7 @@ public class QuestionService {
         int questionId = questionsMapper.registQuestion(question);
 
         // 質問画像があれば登録する
-        if (!img.isEmpty()) {
+        if (img != null & !img.isEmpty()) {
 
             // 画像パスを取得する
             String imgPath = PathUtils.createQuestionImagePath(questionId, img.getOriginalFilename());
@@ -245,7 +245,7 @@ public class QuestionService {
             questionImagesMapper.registQuestionImage(questionImage);
 
             // S3にアップロードする
-            s3Access.uploadQuestionImage(imgPath, ConvertUtils.convertFile(img));
+            s3Access.uploadQuestionImage(imgPath, ConvertUtils.convertFile(img), img.getContentType(), img.getSize());
         }
     }
 

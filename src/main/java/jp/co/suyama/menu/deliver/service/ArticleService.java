@@ -184,7 +184,7 @@ public class ArticleService {
             articlesId = articlesMapper.registArticle(articles);
 
             // サムネイルがある場合
-            if (!thumb.isEmpty()) {
+            if (thumb != null && !thumb.isEmpty()) {
                 // サムネイル画像のパスを更新する
                 String fileName = thumb.getOriginalFilename();
                 thumbPath = PathUtils.createArticleImagePath(articlesId, fileName);
@@ -212,7 +212,7 @@ public class ArticleService {
             }
 
             // サムネイルがある場合
-            if (!thumb.isEmpty()) {
+            if (thumb != null && !thumb.isEmpty()) {
                 // サムネイル画像のパスを更新する
                 String fileName = thumb.getOriginalFilename();
                 thumbPath = PathUtils.createArticleImagePath(articlesId, fileName);
@@ -250,9 +250,9 @@ public class ArticleService {
         }
 
         // サムネイルファイルをS3にアップロードする
-        if (!thumb.isEmpty()) {
+        if (thumb != null && !thumb.isEmpty()) {
             File thumbFile = ConvertUtils.convertFile(thumb);
-            s3Access.uploadArticleImage(thumbPath, thumbFile);
+            s3Access.uploadArticleImage(thumbPath, thumbFile, thumb.getContentType(), thumb.getSize());
         }
 
         // 記事内容をS3にアップロードする

@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +50,9 @@ import jp.co.suyama.menu.deliver.utils.PathUtils;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class MenuService {
+
+    // ロガー
+    private Logger log = LoggerFactory.getLogger(MenuService.class);
 
     // S3アクセス
     @Autowired
@@ -248,7 +253,7 @@ public class MenuService {
             menusId = menusMapper.registMenu(menus);
 
             // サムネイル画像がある場合
-            if (!thumb.isEmpty()) {
+            if (thumb != null && !thumb.isEmpty()) {
                 // サムネイル画像のパスを更新する
                 String fileName = thumb.getOriginalFilename();
                 thumbPath = PathUtils.createMenuImagePath(menusId, fileName);
@@ -277,7 +282,7 @@ public class MenuService {
             }
 
             // サムネイル画像がある場合
-            if (!thumb.isEmpty()) {
+            if (thumb != null && !thumb.isEmpty()) {
                 // サムネイル画像のパスを更新する
                 String fileName = thumb.getOriginalFilename();
                 thumbPath = PathUtils.createMenuImagePath(menusId, fileName);
@@ -317,6 +322,7 @@ public class MenuService {
             // 献立内容をオブジェクトに変換する
             menuCompArray = objectMapper.readValue(contents, MenuComposition[].class);
         } catch (Exception e) {
+            log.error("content: [{}]", contents);
             throw new MenuDeliverException("献立内容の変換に失敗しました。");
         }
 
@@ -386,15 +392,14 @@ public class MenuService {
         }
 
         // サムネイルファイルをS3にアップロードする
-        if (!thumb.isEmpty()) {
-            File thumbFile = ConvertUtils.convertFile(thumb);
-            s3Access.uploadMenuImage(thumbPath, thumbFile);
+        if (thumb != null && !thumb.isEmpty()) {
+            s3Access.uploadMenuImage(thumbPath, thumb, thumb.getContentType(), thumb.getSize());
         }
 
         // 作り方ファイルをS3にアップロードする
         for (Entry<String, MultipartFile> filePath : filePaths.entrySet()) {
-            File file = ConvertUtils.convertFile(filePath.getValue());
-            s3Access.uploadMenuImage(filePath.getKey(), file);
+            s3Access.uploadMenuImage(filePath.getKey(), filePath.getValue(), filePath.getValue().getContentType(),
+                    filePath.getValue().getSize());
         }
 
         // 献立と作り方をまとめてS3にアップロードする
