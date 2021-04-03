@@ -1,6 +1,5 @@
 package jp.co.suyama.menu.deliver.common;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -43,16 +42,9 @@ public class S3Access {
      * @param key  オブジェクトキー
      * @param file アイコンファイル
      */
-    public void uploadUserIcon(String key, File file, String contentType, long length) {
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentType(contentType);
-        metadata.setContentLength(length);
-        PutObjectRequest request = new PutObjectRequest(bucket, MenuDeliverConstants.USER_ICON_PATH + key, file);
-        request.setMetadata(metadata);
-
-        log.info("contentType: [{}], length: [{}]", contentType, length);
-
-        s3.putObject(request);
+    public void uploadUserIcon(String key, MultipartFile file) {
+        String objectKey = MenuDeliverConstants.USER_ICON_PATH + key;
+        upload(objectKey, file);
     }
 
     /**
@@ -61,23 +53,9 @@ public class S3Access {
      * @param key  オブジェクトキー
      * @param file 献立画像
      */
-    public void uploadMenuImage(String key, MultipartFile file, String contentType, long length) {
-        try {
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentType(contentType);
-            metadata.setContentLength(length);
-            PutObjectRequest request;
-            request = new PutObjectRequest(bucket, MenuDeliverConstants.MENU_IMAGE_PATH + key, file.getInputStream(),
-                    metadata);
-
-            log.info("bucket: [{}], path: [{}], contentType: [{}], length: [{}]", bucket,
-                    MenuDeliverConstants.MENU_IMAGE_PATH + key, contentType, length);
-
-            s3.putObject(request);
-        } catch (IOException e) {
-            // アップロード時にエラー
-            throw new MenuDeliverException("アップロードが失敗しました。", e);
-        }
+    public void uploadMenuImage(String key, MultipartFile file) {
+        String objectKey = MenuDeliverConstants.MENU_IMAGE_PATH + key;
+        upload(objectKey, file);
     }
 
     /**
@@ -86,17 +64,9 @@ public class S3Access {
      * @param key  オブジェクトキー
      * @param file 記事画像
      */
-    public void uploadArticleImage(String key, File file, String contentType, long length) {
-//        ObjectMetadata metadata = new ObjectMetadata();
-//        metadata.setContentType(contentType);
-//        metadata.setContentLength(length);
-//        PutObjectRequest request = new PutObjectRequest(bucket, MenuDeliverConstants.ARTICLE_IMAGE_PATH + key, file);
-//        request.setMetadata(metadata);
-//
-//        log.info("contentType: [{}], length: [{}]", contentType, length);
-//
-//        s3.putObject(request);
-        s3.putObject(bucket, MenuDeliverConstants.ARTICLE_IMAGE_PATH + key, file);
+    public void uploadArticleImage(String key, MultipartFile file) {
+        String objectKey = MenuDeliverConstants.ARTICLE_IMAGE_PATH + key;
+        upload(objectKey, file);
     }
 
     /**
@@ -107,18 +77,6 @@ public class S3Access {
      */
     public void uploadMenuDetail(String key, Map<String, String> contents) {
         try {
-//            String contentsString = objectMapper.writeValueAsString(contents);
-//
-//            ObjectMetadata metadata = new ObjectMetadata();
-//            metadata.setContentType("json");
-//            metadata.setContentLength(contentsString.getBytes().length);
-//            PutObjectRequest request = new PutObjectRequest(bucket, MenuDeliverConstants.MENU_DETAIL_PATH + key,
-//                    contentsString);
-//            request.setMetadata(metadata);
-//
-//            log.info("length: [{}]", contentsString.getBytes().length);
-//
-//            s3.putObject(request);
             s3.putObject(bucket, MenuDeliverConstants.MENU_DETAIL_PATH + key,
                     objectMapper.writeValueAsString(contents));
         } catch (Exception e) {
@@ -135,16 +93,9 @@ public class S3Access {
      */
     public void uploadArticleDetail(String key, String contents) {
         try {
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentType("json");
-            metadata.setContentLength(contents.getBytes().length);
-            PutObjectRequest request = new PutObjectRequest(bucket, MenuDeliverConstants.ARTICLE_DETAIL_PATH + key,
-                    objectMapper.writeValueAsString(contents));
-            request.setMetadata(metadata);
+            String objectKey = MenuDeliverConstants.ARTICLE_DETAIL_PATH + key;
 
-            log.info("length: [{}]", contents.getBytes().length);
-
-            s3.putObject(request);
+            s3.putObject(bucket, objectKey, objectMapper.writeValueAsString(contents));
         } catch (Exception e) {
             // アップロード時にエラー
             throw new MenuDeliverException("アップロードが失敗しました。", e);
@@ -157,16 +108,9 @@ public class S3Access {
      * @param key  オブジェクトキー
      * @param file 質問画像
      */
-    public void uploadQuestionImage(String key, File file, String contentType, long length) {
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentType(contentType);
-        metadata.setContentLength(length);
-        PutObjectRequest request = new PutObjectRequest(bucket, MenuDeliverConstants.QUESTION_IMAGE_PATH + key, file);
-        request.setMetadata(metadata);
-
-        log.info("contentType: [{}], length: [{}]", contentType, length);
-
-        s3.putObject(request);
+    public void uploadQuestionImage(String key, MultipartFile file) {
+        String objectKey = MenuDeliverConstants.QUESTION_IMAGE_PATH + key;
+        upload(objectKey, file);
     }
 
     /**
@@ -175,13 +119,9 @@ public class S3Access {
      * @param key  オブジェクトキー
      * @param file 回答画像
      */
-    public void uploadAnswerImage(String key, File file, String contentType, long length) {
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentType(contentType);
-        metadata.setContentLength(length);
-        PutObjectRequest request = new PutObjectRequest(bucket, MenuDeliverConstants.ANSWER_IMAGE_PATH + key, file);
-        request.setMetadata(metadata);
-        s3.putObject(request);
+    public void uploadAnswerImage(String key, MultipartFile file) {
+        String objectKey = MenuDeliverConstants.ANSWER_IMAGE_PATH + key;
+        upload(objectKey, file);
     }
 
     /**
@@ -192,5 +132,26 @@ public class S3Access {
     public void deleteItems(List<String> keys) {
         DeleteObjectsRequest dor = new DeleteObjectsRequest(bucket).withKeys(keys.toArray(new String[] {}));
         s3.deleteObjects(dor);
+    }
+
+    private void upload(String objectKey, MultipartFile file) {
+        try {
+            String contentType = file.getContentType();
+            long length = file.getSize();
+
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentType(contentType);
+            metadata.setContentLength(length);
+            PutObjectRequest request;
+            request = new PutObjectRequest(bucket, objectKey, file.getInputStream(), metadata);
+
+            log.info("bucket: [{}], path: [{}], contentType: [{}], length: [{}]", bucket, objectKey, contentType,
+                    length);
+
+            s3.putObject(request);
+        } catch (IOException e) {
+            // アップロード時にエラー
+            throw new MenuDeliverException("アップロードが失敗しました。", e);
+        }
     }
 }

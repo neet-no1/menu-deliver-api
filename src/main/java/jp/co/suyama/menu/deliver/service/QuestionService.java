@@ -26,7 +26,6 @@ import jp.co.suyama.menu.deliver.model.db.Answers;
 import jp.co.suyama.menu.deliver.model.db.QuestionImages;
 import jp.co.suyama.menu.deliver.model.db.Questions;
 import jp.co.suyama.menu.deliver.model.db.Users;
-import jp.co.suyama.menu.deliver.utils.ConvertUtils;
 import jp.co.suyama.menu.deliver.utils.PageNationUtils;
 import jp.co.suyama.menu.deliver.utils.PathUtils;
 
@@ -182,7 +181,7 @@ public class QuestionService {
             answerImagesMapper.registAnswerImage(answerImage);
 
             // S3にアップロードする
-            s3Access.uploadAnswerImage(imgPath, ConvertUtils.convertFile(img), img.getContentType(), img.getSize());
+            s3Access.uploadAnswerImage(imgPath, img);
         }
     }
 
@@ -245,7 +244,7 @@ public class QuestionService {
             questionImagesMapper.registQuestionImage(questionImage);
 
             // S3にアップロードする
-            s3Access.uploadQuestionImage(imgPath, ConvertUtils.convertFile(img), img.getContentType(), img.getSize());
+            s3Access.uploadQuestionImage(imgPath, img);
         }
     }
 

@@ -1,6 +1,5 @@
 package jp.co.suyama.menu.deliver.service;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -43,7 +42,6 @@ import jp.co.suyama.menu.deliver.model.db.MenuDetails;
 import jp.co.suyama.menu.deliver.model.db.MenuPictures;
 import jp.co.suyama.menu.deliver.model.db.Menus;
 import jp.co.suyama.menu.deliver.model.db.Users;
-import jp.co.suyama.menu.deliver.utils.ConvertUtils;
 import jp.co.suyama.menu.deliver.utils.PageNationUtils;
 import jp.co.suyama.menu.deliver.utils.PathUtils;
 
@@ -393,13 +391,12 @@ public class MenuService {
 
         // サムネイルファイルをS3にアップロードする
         if (thumb != null && !thumb.isEmpty()) {
-            s3Access.uploadMenuImage(thumbPath, thumb, thumb.getContentType(), thumb.getSize());
+            s3Access.uploadMenuImage(thumbPath, thumb);
         }
 
         // 作り方ファイルをS3にアップロードする
         for (Entry<String, MultipartFile> filePath : filePaths.entrySet()) {
-            s3Access.uploadMenuImage(filePath.getKey(), filePath.getValue(), filePath.getValue().getContentType(),
-                    filePath.getValue().getSize());
+            s3Access.uploadMenuImage(filePath.getKey(), filePath.getValue());
         }
 
         // 献立と作り方をまとめてS3にアップロードする

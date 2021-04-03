@@ -1,6 +1,5 @@
 package jp.co.suyama.menu.deliver.service;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +23,6 @@ import jp.co.suyama.menu.deliver.model.db.ArticleDetails;
 import jp.co.suyama.menu.deliver.model.db.Articles;
 import jp.co.suyama.menu.deliver.model.db.FavoriteArticles;
 import jp.co.suyama.menu.deliver.model.db.Users;
-import jp.co.suyama.menu.deliver.utils.ConvertUtils;
 import jp.co.suyama.menu.deliver.utils.PageNationUtils;
 import jp.co.suyama.menu.deliver.utils.PathUtils;
 
@@ -251,8 +249,7 @@ public class ArticleService {
 
         // サムネイルファイルをS3にアップロードする
         if (thumb != null && !thumb.isEmpty()) {
-            File thumbFile = ConvertUtils.convertFile(thumb);
-            s3Access.uploadArticleImage(thumbPath, thumbFile, thumb.getContentType(), thumb.getSize());
+            s3Access.uploadArticleImage(thumbPath, thumb);
         }
 
         // 記事内容をS3にアップロードする

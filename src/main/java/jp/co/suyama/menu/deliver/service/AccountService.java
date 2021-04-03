@@ -1,6 +1,5 @@
 package jp.co.suyama.menu.deliver.service;
 
-import java.io.File;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -39,7 +38,6 @@ import jp.co.suyama.menu.deliver.mapper.UsersMapperImpl;
 import jp.co.suyama.menu.deliver.model.auto.AccountData;
 import jp.co.suyama.menu.deliver.model.db.Bounce;
 import jp.co.suyama.menu.deliver.model.db.Users;
-import jp.co.suyama.menu.deliver.utils.ConvertUtils;
 import jp.co.suyama.menu.deliver.utils.PathUtils;
 
 @Service
@@ -240,8 +238,7 @@ public class AccountService {
 
         // ユーザアイコンをS3にアップロードする
         if (icon != null && !icon.isEmpty()) {
-            File file = ConvertUtils.convertFile(icon);
-            s3Access.uploadUserIcon(iconPath, file, icon.getContentType(), icon.getSize());
+            s3Access.uploadUserIcon(iconPath, icon);
         }
     }
 
