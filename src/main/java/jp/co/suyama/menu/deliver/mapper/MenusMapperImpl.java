@@ -17,12 +17,13 @@ public interface MenusMapperImpl extends MenusMapper {
     // @formatter:off
     @Select({
           "insert into menus"
-        , "(user_id, title, sub_title, category_id, opened, created_at, updated_at)"
+        , "(user_id, title, sub_title, path, category_id, opened, created_at, updated_at)"
         , "values"
         , "("
         , "  #{userId,jdbcType=INTEGER},"
         , "  #{title,jdbcType=VARCHAR},"
         , "  #{subTitle,jdbcType=VARCHAR},"
+        , "  #{path,jdbcType=VARCHAR},"
         , "  #{categoryId,jdbcType=INTEGER},"
         , "  #{opened,jdbcType=BIT},"
         , "  current_timestamp,"
