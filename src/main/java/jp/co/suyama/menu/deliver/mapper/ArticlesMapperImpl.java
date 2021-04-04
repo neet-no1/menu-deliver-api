@@ -17,11 +17,12 @@ public interface ArticlesMapperImpl extends ArticlesMapper {
     // @formatter:off
     @Select({
           "insert into articles"
-        , "(user_id, title, start_sentence, opened, created_at, updated_at)"
+        , "(user_id, title, path, start_sentence, opened, created_at, updated_at)"
         , "values"
         , "("
         , "  #{userId,jdbcType=INTEGER},"
         , "  #{title,jdbcType=VARCHAR},"
+        , "  #{path,jdbcType=VARCHAR},"
         , "  #{startSentence,jdbcType=VARCHAR},"
         , "  #{opened,jdbcType=BIT},"
         , "  current_timestamp,"
