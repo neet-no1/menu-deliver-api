@@ -253,7 +253,7 @@ public class MenuService {
             // サムネイル画像がある場合
             if (thumb != null && !thumb.isEmpty()) {
                 // サムネイル画像のパスを更新する
-                String fileName = thumb.getOriginalFilename();
+                String fileName = menusId + "thumb";
                 thumbPath = PathUtils.createMenuImagePath(menusId, fileName);
                 menusMapper.updateMenusPath(menusId, thumbPath);
             }
@@ -282,7 +282,7 @@ public class MenuService {
             // サムネイル画像がある場合
             if (thumb != null && !thumb.isEmpty()) {
                 // サムネイル画像のパスを更新する
-                String fileName = thumb.getOriginalFilename();
+                String fileName = menusId + "thumb";
                 thumbPath = PathUtils.createMenuImagePath(menusId, fileName);
                 menus.setPath(thumbPath);
                 deletePath.add(PathUtils.getArticleImagePath(existMenus.getPath()));
@@ -367,8 +367,9 @@ public class MenuService {
             }
 
             // ファイルパスを取得する
+            String fileName = menusId + "image" + i;
             MultipartFile file = files.get(i);
-            String imgPath = PathUtils.createMenuImagePath(menusId, file.getOriginalFilename());
+            String imgPath = PathUtils.createMenuImagePath(menusId, fileName);
 
             MenuPictures pictures = new MenuPictures();
             pictures.setMenuId(menusId);

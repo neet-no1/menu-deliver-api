@@ -156,7 +156,13 @@ public class PathUtils {
             throw new MenuDeliverException("暗号化に失敗しました。", e);
         }
 
-        return new String(Base64.getEncoder().encode(byteToken));
+        String encodedParam = new String(Base64.getEncoder().encode(byteToken));
+
+        // "/"や"+"を変換する
+        encodedParam = encodedParam.replaceAll("/", "A");
+        encodedParam = encodedParam.replaceAll("\\+", "B");
+
+        return null;
     }
 
 }
