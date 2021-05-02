@@ -162,7 +162,7 @@ public class PathUtils {
         encodedParam = encodedParam.replaceAll("/", "A");
         encodedParam = encodedParam.replaceAll("\\+", "B");
 
-        return null;
+        return encodedParam;
     }
 
 }
