@@ -33,7 +33,7 @@ aws:
   s3:
     bucket: ${AWS_S3_BUCKET}
 
-domain: wwww.menu-deliver.work
+domain: www.menu-deliver.work
 
 ---
 spring:
@@ -61,4 +61,4 @@ spring:
 mail:
   from: info@menu-deliver.com
 
-domain: menu-deliver.com
+domain: www.menu-deliver.com
