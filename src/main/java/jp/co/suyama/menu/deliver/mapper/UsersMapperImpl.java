@@ -58,6 +58,8 @@ public interface UsersMapperImpl extends UsersMapper {
       , "set"
       , "  email = #{email,jdbcType=VARCHAR},"
       , "  password = #{password,jdbcType=VARCHAR},"
+      , "  name = #{name,jdbcType=VARCHAR},"
+      , "  icon = #{icon,jdbcType=VARCHAR},"
       , "  available = #{available,jdbcType=BIT},"
       , "  once_password = #{oncePassword,jdbcType=VARCHAR},"
       , "  expires = #{expires,jdbcType=TIMESTAMP},"
