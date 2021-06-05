@@ -321,7 +321,7 @@ public class MenuService {
             menuCompArray = objectMapper.readValue(contents, MenuComposition[].class);
         } catch (Exception e) {
             log.error("content: [{}]", contents);
-            throw new MenuDeliverException("献立内容の変換に失敗しました。");
+            throw new MenuDeliverException("献立内容の変換に失敗しました。", e);
         }
 
         // 重複しない食品番号のリストを取得する
