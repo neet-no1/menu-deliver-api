@@ -78,6 +78,12 @@
 			<version>1.11.983</version>
 		</dependency>
 
+		<!-- MAIL -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+
 		<!-- S3 -->
 		<dependency>
 			<groupId>com.amazonaws</groupId>

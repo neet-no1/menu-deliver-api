@@ -25,7 +25,7 @@ logging:
     jp.co.suyama.menu.deliver.mapper: DEBUG
 
 mail:
-  from: info@menu-deliver.work
+  from: info@menu-deliver.local
 
 aws:
   accessKeyId: ${AWS_ACCESS_KEY_ID}
@@ -33,7 +33,7 @@ aws:
   s3:
     bucket: ${AWS_S3_BUCKET}
 
-domain: www.menu-deliver.work
+domain: http://localhost:8080
 
 ---
 spring:
@@ -47,6 +47,8 @@ spring:
 
 mail:
   from: info@menu-deliver.work
+  
+domain: https://www.menu-deliver.work
 
 ---
 spring:
@@ -61,4 +63,4 @@ spring:
 mail:
   from: info@menu-deliver.com
 
-domain: www.menu-deliver.com
+domain: https://www.menu-deliver.com
