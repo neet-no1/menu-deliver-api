@@ -21,17 +21,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
-import com.amazonaws.services.simpleemail.model.Body;
-import com.amazonaws.services.simpleemail.model.Content;
-import com.amazonaws.services.simpleemail.model.Destination;
-import com.amazonaws.services.simpleemail.model.Message;
-import com.amazonaws.services.simpleemail.model.SendEmailRequest;
 import com.amazonaws.services.simpleemail.model.SendEmailResult;
 
 import jp.co.suyama.menu.deliver.common.MenuDeliverConstants;
 import jp.co.suyama.menu.deliver.common.Role;
 import jp.co.suyama.menu.deliver.common.S3Access;
+import jp.co.suyama.menu.deliver.config.SendMail;
 import jp.co.suyama.menu.deliver.exception.MenuDeliverException;
 import jp.co.suyama.menu.deliver.mapper.BounceMapperImpl;
 import jp.co.suyama.menu.deliver.mapper.UsersMapperImpl;
@@ -51,9 +46,8 @@ public class AccountService {
     @Autowired
     private S3Access s3Access;
 
-    // AWS SESのクライアント
     @Autowired
-    private AmazonSimpleEmailService sesClient;
+    private SendMail sendMailClient;
 
     // メール件名
     private static final String SUBJECT = "メールアドレス認証";
@@ -106,7 +100,7 @@ public class AccountService {
         expires.add(Calendar.DAY_OF_MONTH, 1);
 
         // メールアドレス認証用アドレス
-        String confirmUrl = "https://" + DOMAIN + "/create/account/done?key=" + uuid;
+        String confirmUrl = DOMAIN + "/#/create/account/done?key=" + uuid;
 
         VelocityContext context = new VelocityContext();
         context.put("mail", email);
@@ -137,12 +131,7 @@ public class AccountService {
         bounceMapper.insert(bounce);
 
         // メールを送信する
-        SendEmailRequest request = new SendEmailRequest().withDestination(new Destination().withToAddresses(email))
-                .withMessage(new Message()
-                        .withBody(new Body().withText(new Content().withCharset("UTF-8").withData(writer.toString())))
-                        .withSubject(new Content().withCharset("UTF-8").withData(SUBJECT)))
-                .withSource(FROM);
-        SendEmailResult mailResult = sesClient.sendEmail(request);
+        SendEmailResult mailResult = sendMailClient.sendMail(FROM, email, SUBJECT, writer.toString());
 
         // ログに記録する
         log.info("Regist Account: userId:[{}] messageId:[{}] requestId:[{}]", userId, mailResult.getMessageId(),
@@ -310,12 +299,7 @@ public class AccountService {
         velocityEngine.mergeTemplate("mail/PasswordReset.vm", "UTF-8", context, writer);
 
         // メールを送信する
-        SendEmailRequest request = new SendEmailRequest().withDestination(new Destination().withToAddresses(email))
-                .withMessage(new Message()
-                        .withBody(new Body().withText(new Content().withCharset("UTF-8").withData(writer.toString())))
-                        .withSubject(new Content().withCharset("UTF-8").withData("パスワードリセットのお知らせ")))
-                .withSource(FROM);
-        SendEmailResult mailResult = sesClient.sendEmail(request);
+        SendEmailResult mailResult = sendMailClient.sendMail(FROM, email, "パスワードリセットのお知らせ", writer.toString());
 
         // ログに記録する
         log.info("Password Reset: userId:[{}] messageId:[{}] requestId:[{}]", user.getId(), mailResult.getMessageId(),
