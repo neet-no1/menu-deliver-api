@@ -9,6 +9,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +31,9 @@ import jp.co.suyama.menu.deliver.utils.PageNationUtils;
 
 @RestController
 public class SearchController implements SearchApi {
+
+    // ロガー
+    private Logger log = LoggerFactory.getLogger(SearchController.class);
 
     // 献立サービス
     @Autowired
@@ -79,6 +84,9 @@ public class SearchController implements SearchApi {
 
         // レスポンス作成
         MenusResponse response = new MenusResponse();
+
+        // ログ
+        log.info("献立検索 keyword: {}, categories: {}, page: {}", keyword, categories, page);
 
         // デフォルト値を設定
         keyword = keyword == null ? "" : keyword;

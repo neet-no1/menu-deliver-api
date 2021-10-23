@@ -1,5 +1,6 @@
 package jp.co.suyama.menu.deliver.config;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,6 +14,8 @@ import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
+import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
+import org.springframework.session.web.http.HttpSessionIdResolver;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -71,21 +74,28 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // csrfトークンをクッキーに保存するように設定
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))*/
             // cors設定
-            //.cors()
-            //    .configurationSource(this.corsConfigurationSource());
+            .cors()
+                .configurationSource(this.corsConfigurationSource());
             ;
         // @formatter:on
     }
 
+    @Bean
+    public HttpSessionIdResolver httpSessionIdResolver() {
+        return HeaderHttpSessionIdResolver.xAuthToken();
+    }
+
     private CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration corsConfiguration = new CorsConfiguration();
-        // corsConfiguration.addAllowedMethod("GET");
-        corsConfiguration.addAllowedOrigin("https://www.menu-deliver.work");
+        CorsConfiguration configuration = new CorsConfiguration();
+        // configuration.setAllowedOrigins(Arrays.asList("https://www.menu-deliver.work",
+        // "http//localhost:8080"));
+        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST"));
 
-        UrlBasedCorsConfigurationSource corsSource = new UrlBasedCorsConfigurationSource();
-        corsSource.registerCorsConfiguration("/**", corsConfiguration);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
 
-        return corsSource;
+        return source;
     }
 
     /**

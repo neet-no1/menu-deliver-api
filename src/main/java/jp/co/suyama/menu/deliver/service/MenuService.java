@@ -491,6 +491,9 @@ public class MenuService {
      */
     public MenusAndPage searchMenus(List<String> keywordList, List<Integer> categories, int page) {
 
+        // ログ
+        log.info("献立検索 keywordList: {}, categories: {}, page: {}", keywordList, categories, page);
+
         // レスポンス
         MenusAndPage result = new MenusAndPage();
 

@@ -28,6 +28,7 @@ server:
 logging:
   level:
     jp.co.suyama.menu.deliver.mapper: DEBUG
+    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
 
 mail:
   from: info@menu-deliver.local
